@@ -33,12 +33,12 @@ class UserInfo(models.Model):
     studentNum = models.CharField(max_length=15, primary_key=True)
     password = models.CharField(max_length=64)
     username = models.CharField(max_length=15)
-    cid = models.ForeignKey('ClassInfo', null=True)
+    cid = models.ForeignKey('ClassInfo', null=True, on_delete=models.CASCADE)
     nickname = models.CharField(max_length=30, null=True)
-    major = models.ForeignKey('MajorInfo', null=True)
+    major = models.ForeignKey('MajorInfo', null=True, on_delete=models.CASCADE)
     hobby = models.CharField(max_length=30, null=True)
     age = models.IntegerField(null=True)
-    user_type = models.ForeignKey(to='UserType')
+    user_type = models.ForeignKey(to='UserType', on_delete=models.CASCADE)
     gender = models.IntegerField(default=1)
     phone = models.CharField(max_length=11)
     motto = models.TextField(null=True)
@@ -50,7 +50,7 @@ class UserInfo(models.Model):
 # 签到表设计
 class Attendence(models.Model):
     #签到表   字段：用户，签到时间，签退时间，描述   其他是为了方便操作加的字段可不写
-    stu = models.ForeignKey('UserInfo')
+    stu = models.ForeignKey('UserInfo', on_delete=models.CASCADE)
     # cur_time = models.DateTimeField(auto_now_add=True)
     start_time = models.DateTimeField(null=True, blank=True)
     end_time = models.DateTimeField(null=True, blank=True)
@@ -68,7 +68,7 @@ class Attendence(models.Model):
 # 公告表设计
 class Notice(models.Model):
     # 公告表  字段：发布人,发布日期，发布标题，发布内容，发布级别
-    author = models.ForeignKey('UserInfo')
+    author = models.ForeignKey('UserInfo', on_delete=models.CASCADE)
     post_date = models.DateTimeField(auto_now=True)
     head = models.TextField(max_length=200)
     content = models.TextField(max_length=500)
@@ -78,7 +78,7 @@ class Notice(models.Model):
 # 请假表设计
 class Leave(models.Model):
     # 请假表 字段：用户，开始时间，结束时间，请假原因
-    user = models.ForeignKey(to='UserInfo')
+    user = models.ForeignKey(to='UserInfo', on_delete=models.CASCADE)
     start_time = models.DateField(null=True, blank=True)
     end_time = models.DateField(null=True, blank=True)
     explain = models.TextField(default='无', max_length=500)
@@ -99,7 +99,7 @@ class ExamContent(models.Model):
 #  考核成绩表设计
 class Exam(models.Model):
     # 考核成绩表  字段： 用户，考核内容，分数，备注
-    user = models.ForeignKey('UserInfo')
-    content = models.ForeignKey(to='ExamContent')
+    user = models.ForeignKey('UserInfo', on_delete=models.CASCADE)
+    content = models.ForeignKey(to='ExamContent', on_delete=models.CASCADE)
     point = models.DecimalField(max_digits=3, decimal_places=0, default=0)
     detail = models.TextField(max_length=200, default="无")
