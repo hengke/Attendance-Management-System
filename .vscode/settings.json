@@ -1,3 +1,11 @@
 {
-    "python.pythonPath": "${workspaceFolder}/venv/bin/python3.7"
+    "python.pythonPath": "${workspaceFolder}/venv/bin/python3.7",
+    "sqltools.connections": [
+        {
+            "database": "/home/zhhk/GitHub/Attendance-Management-System/db.sqlite3",
+            "dialect": "SQLite",
+            "name": "sqlite"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
 }
