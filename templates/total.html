@@ -2,7 +2,7 @@
 {% block content %}
     <h1 class="page-header">管理页面</h1>
 
-    <div class="row">
+    <!-- <div class="row">
         <div class="col-sm-6 col-md-3">
             <div class="thumbnail">
                 <img src="/static/uploads/slide1.jpg"
@@ -43,13 +43,13 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
-    <script src="https://cdn.bootcss.com/echarts/4.0.4/echarts-en.common.min.js"></script>
+    <!-- <script src="https://cdn.bootcss.com/echarts/4.2.1/echarts-en.common.min.js"></script> -->
+    <script src="../static/js/echarts-en.common.min.js"></script>
     <div class="row">
         <div class="col-md-12" id="mainchart" style="height:400px ">
         </div>
-
     </div>
 
     <!--面板开始-->
@@ -137,7 +137,9 @@
                                 xAxis: {
                                     data: names
                                 },
-                                yAxis: {},
+                                yAxis: {
+                                    type: 'value'
+                                },
                                 series: [{
                                     name: '时间',
                                     type: 'bar',
