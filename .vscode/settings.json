@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "${workspaceFolder}/venv/bin/python3.7",
+    "python.pythonPath": "venv\\Scripts\\python.exe",
     "sqltools.connections": [
         {
             "database": "/home/zhhk/GitHub/Attendance-Management-System/db.sqlite3",
