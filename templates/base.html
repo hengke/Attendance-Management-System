@@ -52,29 +52,24 @@
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-sm-3 col-md-2 sidebar">
+        <!-- <div class="col-sm-3 col-md-2 sidebar"> -->
+        <div class="col-sm-3 col-md-2 main">
             <ul class="nav nav-sidebar">
                 <li><a href="/check/">签到</a></li>
-                <li><a href="/total/">考勤统计 <span class="sr-only">考勤统计</span></a>
-                </li>
+                <li><a href="/total/">考勤统计 <span class="sr-only">考勤统计</span></a></li>
                 <li><a href="/notice/">公告墙</a></li>
                 <li><a href="/noticeManage/">公告墙管理</a></li>
                 <li><a href="/exam/">考核评定记录</a></li>
                 <li><a href="/exam_manage/">考核管理</a></li>
-
                 <li><a href="/leave/">请假管理</a></li>
-                <li ><a href="#">考勤数据设置</a></li>
+                <li><a href="#">考勤数据设置</a></li>
                 <li><a href="/memberManage/">成员管理</a></li>
                 <li><a href="/classManage/">班级管理</a></li>
                 <li><a href="/majorManage/">专业管理</a></li>
-
-
-
-
             </ul>
-            <hr>
         </div>
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <!-- <hr> -->
+        <div class="col-sm-9 col-md-10 main">
             {% block content %}
             {% endblock content %}
         </div>
