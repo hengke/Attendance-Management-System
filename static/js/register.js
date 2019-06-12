@@ -127,16 +127,16 @@ $(function () {/* 文档加载，执行一个函数*/
                     message: 'The student number is not valid',
                     validators: {
                         notEmpty: {
-                            message: '学号不能为空'
+                            message: '员工编号不能为空'
                         },
                         stringLength: {
                             min: 11,
                             max: 11,
-                            message: '请输入11位学号（不足11位首位用x填充）'
+                            message: '请输入11位员工编号（不足11位首位用x填充）'
                         },
                         regexp: {
                             regexp: /^(x?[0-9]){10}|([0-9]{11})$/,
-                            message: '请输入正确的学号'
+                            message: '请输入正确的员工编号'
                         }
                     }
                 },

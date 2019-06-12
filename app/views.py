@@ -202,7 +202,7 @@ def register_verify(request):
         return HttpResponse('OK')
 
 
-# 班级管理
+# 部门管理
 def classManage(request):
     (flag, rank) = check_cookie(request)
     print('flag', flag)
@@ -217,7 +217,7 @@ def classManage(request):
         return render(request, 'page-login.html', {'error_msg': ''})
 
 
-# 编辑班级
+# 编辑部门
 @csrf_exempt
 def edit_class(request):
     (flag, rank) = check_cookie(request)
@@ -233,17 +233,17 @@ def edit_class(request):
                 if not temp_flag and class_name:
                     pre_obj.name = class_name
                     pre_obj.save()
-                return HttpResponse('班级修改成功')
+                return HttpResponse('部门修改成功')
             class_list = ClassInfo.objects.all()
             return render(request, 'classManage.html', {'class_list': class_list})
-            # return HttpResponse('编辑班级')
+            # return HttpResponse('编辑部门')
         else:
             return render(request, 'class_manage_denied.html')
     else:
         return render(request, 'page-login.html', {'error_msg': ''})
 
 
-# 添加班级
+# 添加部门
 @csrf_exempt
 def add_class(request):
     # print('进来了')
@@ -258,10 +258,10 @@ def add_class(request):
             if add_class_name:
                 ClassInfo.objects.create(name=add_class_name).save()
 
-        return HttpResponse('添加班级成功')
+        return HttpResponse('添加部门成功')
 
 
-# 删除班级
+# 删除部门
 def delete_class(request):
     (flag, rank) = check_cookie(request)
     print('flag', flag)
@@ -416,7 +416,7 @@ def edit_member(request):
                 edit_member_id = request.GET.get('edit_sno')
                 # 所有用户类型列表
                 stu_type_list = UserType.objects.all()
-                # 所有的班级
+                # 所有的部门
                 cls_list = ClassInfo.objects.all()
                 # 所有的专业
                 major_list = MajorInfo.objects.all()

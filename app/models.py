@@ -13,7 +13,7 @@ class UserType(models.Model):
 
 
 class ClassInfo(models.Model):
-    # 班级信息表  字段:班级名称
+    # 部门信息表  字段:部门名称
     name = models.CharField(max_length=20)
 
     def __str__(self):
@@ -29,7 +29,7 @@ class MajorInfo(models.Model):
 
 
 class UserInfo(models.Model):
-    # 创建用户模型，学号,密码，班级，姓名,昵称，专业,用户类型,电话，姓名,座右铭,邮件
+    # 创建用户模型，员工编号,密码，部门，姓名,昵称，专业,用户类型,电话，姓名,座右铭,邮件
     studentNum = models.CharField(max_length=15, primary_key=True)
     password = models.CharField(max_length=64)
     username = models.CharField(max_length=15)
