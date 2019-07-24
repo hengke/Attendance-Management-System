@@ -2,7 +2,7 @@
     "python.pythonPath": "venv\\Scripts\\python.exe",
     "sqltools.connections": [
         {
-            "database": "/home/zhhk/GitHub/Attendance-Management-System/db.sqlite3",
+            "database": "/home/zhhk/GitHub/Signingin-Management-System/db.sqlite3",
             "dialect": "SQLite",
             "name": "sqlite"
         }

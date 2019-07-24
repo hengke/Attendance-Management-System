@@ -1,8 +1,9 @@
 from django.shortcuts import render, HttpResponse, redirect
+from django.contrib.auth.models import User
 from .forms import loginForm
 from django.contrib.auth import authenticate, login
-from .api import check_cookie, check_login, get_all_major, DecimalEncoder, get_all_class, get_all_type, is_login
-from .models import MajorInfo, UserType, UserInfo, ClassInfo, Attendence, Notice, Leave, ExamContent, Exam
+from .api import check_cookie, check_login, DecimalEncoder, get_all_department, get_all_type, is_login
+from .models import UserType, Employee, Department, Notice, Leave, Holidays, Signingin
 # django自带加密解密库
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import F, Q, Avg, Sum, Max, Min, Count
@@ -38,39 +39,250 @@ def index(request):
     # return render(request, 'page-login.html', {'error_msg': ''})
 
 
+# 登录页面
+@csrf_exempt
+def login(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(username=username, password=password)
+        # print("login:", user)
+        if user is not None:
+            if user.is_active:
+                try:
+                    # print("user.is_active:", user.is_active)
+                    emp = Employee.objects.get(user=user)
+                    # print("login:", emp)
+                    response = redirect('/index/')
+                    response.set_cookie('qwer', username, 3600)
+                    response.set_cookie('asdf', password, 3600)
+                    return response
+                except Employee.DoesNotExist:
+                    # print("Employee.DoesNotExist:", Employee.DoesNotExist)
+                    return render(request, 'edit_emp_info.html', locals())
+            else:
+                return render(request, 'page-login.html', {'error_msg': '账户未激活！请联系管理员！'})
+        else:
+            return render(request, 'page-login.html', {'error_msg': '账号或密码错误请重新输入'})
+    else:
+        (flag, rank) = check_cookie(request)
+        print('flag', flag)
+        if flag:
+            return redirect('/index/')
+        return render(request, 'page-login.html', {'error_msg': ''})
+
+
+def check(request):
+    (flag, rank) = check_cookie(request)
+    # print('check：flag', flag)
+    # print('check：rank', rank)
+    username = rank
+
+
+    if flag:
+        try:
+            user = User.objects.get(username=username)
+            try:
+                emp = Employee.objects.get(user=user)
+            except Employee.DoesNotExist:
+                emp = None
+        except User.DoesNotExist:
+            user = None
+
+        if request.method == 'POST':
+            sign_flag = request.POST.get('sign')
+            # print('check:sign_flag', type(sign_flag), sign_flag)
+            if sign_flag == 'True':
+                Signingin.objects.create(employee=emp, start_time=datetime.datetime.now())
+            elif sign_flag == 'False':
+                cur_attendent = Signingin.objects.filter(employee=emp, end_time=None)
+                tmp_time = datetime.datetime.now()
+                duration = round((tmp_time - cur_attendent.last().start_time).seconds / 3600, 1)
+
+                cur_attendent.update(end_time=tmp_time, duration=duration)
+            return HttpResponse(request, '操作成功')
+        else:
+            # 查询上一个签到的状态
+            pre_att = Signingin.objects.filter(employee=emp).order_by('id').last()
+            # print('check:pre_att', pre_att)
+            if pre_att:
+                # 如果当前时间距上次签到时间超过六小时，并且上次签退时间等于签到时间
+                if (datetime.datetime.now() - pre_att.start_time.replace(
+                        tzinfo=None)).seconds / 3600 > 6 and pre_att.end_time == None:
+                    pre_att.delete()
+                    sign_flag = True
+
+                elif (datetime.datetime.now() - pre_att.start_time.replace(
+                        tzinfo=None)).seconds / 3600 < 6 and pre_att.end_time == None:
+                    sign_flag = False
+                else:
+                    sign_flag = True
+            else:
+                sign_flag = True
+            att_list = Signingin.objects.all().order_by('-id')
+
+            return render(request, 'check.html', locals())
+
+    return render(request, 'page-login.html', {'error_msg': ''})
+
+
+# 编辑员工信息
+def edit_emp_info(request):
+    (flag, rank) = check_cookie(request)
+    # print('check：flag', flag)
+    # print('check：rank', rank)
+    username = rank
+
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        user = User.objects.get(username=username)
+
+        emp_num = request.POST.get('emp_num')
+        department_name = request.POST.get('department')
+        department = Department.objects.get(name=department_name)
+        user_type = UserType.objects.get(caption="普通员工")
+
+        full_name = request.POST.get('full_name')
+        gender = request.POST.get('gender')
+        birth_date = request.POST.get('birth_date')
+        work_phone = request.POST.get('work_phone')
+        cell_phone = request.POST.get('cell_phone')
+        email = request.POST.get('email')
+        user.email = email
+
+        try:
+            emp = Employee.objects.get(user=user)
+            emp.emp_num = emp_num
+            emp.full_name = full_name
+            emp.department = department
+            emp.gender = gender
+            emp.birth_date = birth_date
+            emp.work_phone = work_phone
+            emp.cell_phone = cell_phone
+        except Employee.DoesNotExist:
+            emp = Employee.objects.create(user=user, emp_num=emp_num, full_name=full_name,
+                                          department=department,
+                                          gender=gender, birth_date=birth_date, work_phone=work_phone,
+                                          user_type=user_type,
+                                          cell_phone=cell_phone)
+
+        emp.save()
+        # return HttpResponse('OK')
+        return render(request, 'check.html', locals())
+    else:
+        user = User.objects.get(username=username)
+        emp = Employee.objects.get(user=user)
+        return render(request, 'edit_emp_info.html', locals())
+
+
+# 请假管理
+@is_login
+def leave(request):
+    (flag, username) = check_cookie(request)
+    leave_list = Leave.objects.all()
+    if request.method == 'POST':
+        leavetype = request.POST.get('leavetype')
+        starttime = request.POST.get('starttime')
+        endtime = request.POST.get('endtime')
+        destination = request.POST.get('destination')
+        reason = request.POST.get('reason')
+
+        # now = datetime.datetime.now().strftime('%Y%m%d%s%f')
+        ask_time = datetime.datetime.now()
+        leave_id = "JDYT-YJY-LEAVE-" + datetime.datetime.now().strftime('%Y%m%d%s%f')
+        approval_id = "JDYT-YJY-Approval-" + datetime.datetime.now().strftime('%Y%m%d%s%f')
+
+        user = User.objects.get(username=username)
+        emp = Employee.objects.get(user=user)
+
+        print(starttime)
+
+        Leave.objects.create(employee=emp, leave_id=leave_id, leave_type=leavetype, ask_time=ask_time, start_time=starttime,
+                             end_time=endtime, reason=reason, destination=destination, approval_id=approval_id)
+        a = int(datetime.datetime.strptime(starttime, '%Y-%m-%d').day -
+                datetime.datetime.strptime(endtime, '%Y-%m-%d').day) + 1
+        Signingin.objects.filter(date__gte=starttime, date__lte=endtime, emp=user).update(
+            leave_count=F('leave_count') + a)
+    return render(request, 'leave.html', locals())
+
+
+# 注销登录
+def logout(request):
+    req = redirect('/login/')
+    req.delete_cookie('asdf')
+    req.delete_cookie('qwer')
+    return req
+
+
+# 注册页面
+@csrf_exempt
+def register(request):
+    if request.method == 'POST':
+        if request.is_ajax():
+
+            emp_num_v = request.POST.get('emp_num_verify')
+            if Employee.objects.filter(emp_num=emp_num_v):
+                ret = {'valid': False}
+            else:
+                ret = {'valid': True}
+
+            return HttpResponse(json.dumps(ret))
+
+    else:
+        return render(request, 'register.html')
+
+
+# 注册验证
+def register_verify(request):
+    if request.method == 'POST':
+        print('验证成功')
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        emp_num = request.POST.get('emp_num')
+        pwd = request.POST.get('password')
+        m1 = hashlib.sha1()
+        m1.update(pwd.encode('utf8'))
+        pwd = m1.hexdigest()
+        phone = request.POST.get('phone')
+        a = Employee.objects.create(username=username, email=email, emp_num=emp_num, password=pwd,
+                                    phone=phone, user_type_id=2)
+
+        a.save()
+        return HttpResponse('OK')
+
+
 # 签到统计
 @is_login
 def total(request):
     (flag, user) = check_cookie(request)
+
+    nowdate = datetime.datetime.now()
+    weekDay = datetime.datetime.weekday(nowdate)
+    firstDay = nowdate - datetime.timedelta(days=weekDay)
+    lastDay = nowdate + datetime.timedelta(days=6 - weekDay)
+
     # if flag:
     if request.method == 'POST':
-        nowdate = datetime.datetime.now()
-        weekDay = datetime.datetime.weekday(nowdate)
-        firstDay = nowdate - datetime.timedelta(days=weekDay)
-        lastDay = nowdate + datetime.timedelta(days=6 - weekDay)
         # print(firstDay,lastDay)
-        # info_list=Attendence.objects.filter(date__gte=firstDay,date__lte=lastDay).values('stu','stu__username','stu__cid__name').annotate(total_time=Sum('duration'),leave_count=Sum('is_leave')).order_by()
-        info_list = Attendence.objects.filter(date__gte=firstDay, date__lte=lastDay).values('stu', 'stu__username',
-                                                                                            'stu__cid__name',
-                                                                                            'leave_count') \
+        # info_list=Signingin.objects.filter(date__gte=firstDay,date__lte=lastDay) \
+        #   .values('employee','emp__username','emp__cid__name') \
+        #   .annotate(total_time=Sum('duration'),leave_count=Sum('is_leave')).order_by()
+
+        info_list = Signingin.objects.filter(date__gte=firstDay, date__lte=lastDay) \
+            .values('employee', 'emp__username', 'emp__cid__name', 'leave_count') \
             .annotate(total_time=Sum('duration')).order_by()
         info_list = json.dumps(list(info_list), cls=DecimalEncoder)
 
         return HttpResponse(info_list)
     else:
-        nowdate = datetime.datetime.now()
-        weekDay = datetime.datetime.weekday(nowdate)
-        firstDay = nowdate - datetime.timedelta(days=weekDay)
-        lastDay = nowdate + datetime.timedelta(days=6 - weekDay)
         # print(firstDay,lastDay)
         leave_list = Leave.objects.filter().values('user', 'start_time', 'end_time')
         # print(leave_list)
-        info_list = Attendence.objects.filter(date__gte=firstDay, date__lte=lastDay).values('stu', 'stu__username',
-                                                                                            'stu__cid__name',
-                                                                                            'leave_count') \
+        info_list = Signingin.objects.filter(date__gte=firstDay, date__lte=lastDay) \
+            .values('employee', 'emp__username', 'emp__cid__name', 'leave_count') \
             .annotate(total_time=Sum('duration')).order_by()
 
-        # info_list=Attendence.objects.filter(date__gte=firstDay,date__lte=lastDay).values('stu','stu__username','stu__cid__name')\
+        # info_list=Signingin.objects.filter(date__gte=firstDay,date__lte=lastDay).values('employee','emp__username','emp__cid__name')\
         #     .annotate(total_time=Sum('duration'),leave_count=Sum('is_leave'))\
         #     .extra(
         #     select={'starttime':"select start_time from app_leave where %s BETWEEN start_time AND end_time"},
@@ -86,193 +298,77 @@ def total(request):
     #     return render(request, 'page-login.html', {'error_msg': ''})
 
 
-# 登录页面
-@csrf_exempt
-def login(request):
-    if request.method == 'POST':
-        email = request.POST['email']
-        password = request.POST['password']
-
-        m1 = hashlib.sha1()
-        m1.update(password.encode('utf8'))
-        password = m1.hexdigest()
-        print('密码:', password)
-        if check_login(email, password):
-            response = redirect('/index/')
-            response.set_cookie('qwer', email, 3600)
-            response.set_cookie('asdf', password, 3600)
-            return response
-            # return HttpResponse('登录成功')
-        else:
-            return render(request, 'page-login.html', {'error_msg': '账号或密码错误请重新输入'})
-    else:
-        (flag, rank) = check_cookie(request)
-        print('flag', flag)
-        if flag:
-            return redirect('/index/')
-        return render(request, 'page-login.html', {'error_msg': ''})
-
-
-# 注册页面
-@csrf_exempt
-def register(request):
-    if request.method == 'POST':
-        if request.is_ajax():
-
-            stu_num_v = request.POST.get('stu_num_verify')
-            if UserInfo.objects.filter(studentNum=stu_num_v):
-                ret = {'valid': False}
-            else:
-                ret = {'valid': True}
-
-            return HttpResponse(json.dumps(ret))
-
-    else:
-        return render(request, 'register.html')
-
-
-def check(request):
-    (flag, rank) = check_cookie(request)
-    # print('flag', flag)
-    user = rank
-
-    if flag:
-        if request.method == 'POST':
-            sign_flag = request.POST.get('sign')
-            print('sign_flag', type(sign_flag), sign_flag)
-            if sign_flag == 'True':
-                Attendence.objects.create(stu=user, start_time=datetime.datetime.now())
-            elif sign_flag == 'False':
-                cur_attendent = Attendence.objects.filter(stu=user, end_time=None)
-                tmp_time = datetime.datetime.now()
-                duration = round((tmp_time - cur_attendent.last().start_time).seconds / 3600, 1)
-
-                cur_attendent.update(end_time=tmp_time, duration=duration)
-            return HttpResponse(request, '操作成功')
-        else:
-            # 查询上一个签到的状态
-            pre_att = Attendence.objects.filter(stu=user).order_by('id').last()
-            # print(pre_att.end_time)
-            if pre_att:
-                # 如果当前时间距上次签到时间超过六小时，并且上次签退时间等于签到时间
-                if (datetime.datetime.now() - pre_att.start_time.replace(
-                        tzinfo=None)).seconds / 3600 > 6 and pre_att.end_time == None:
-                    # Attendence.objects.filter(stu=user, end_time=None).update(end_time=pre_att.start_time+datetime.timedelta(hours=2),duration=2,detail="自动签退")
-                    pre_att.delete()
-                    sign_flag = True
-
-                elif (datetime.datetime.now() - pre_att.start_time.replace(
-                        tzinfo=None)).seconds / 3600 < 6 and pre_att.end_time == None:
-                    sign_flag = False
-                else:
-                    sign_flag = True
-            else:
-                sign_flag = True
-            att_list = Attendence.objects.all().order_by('-id')
-
-            return render(request, 'check.html', locals())
-
-    return render(request, 'page-login.html', {'error_msg': ''})
-
-
-# 注销登录
-def logout(request):
-    req = redirect('/login/')
-    req.delete_cookie('asdf')
-    req.delete_cookie('qwer')
-    return req
-
-
-# 注册验证
-def register_verify(request):
-    if request.method == 'POST':
-        print('验证成功')
-        username = request.POST.get('username')
-        email = request.POST.get('email')
-        stu_num = request.POST.get('stu_num')
-        pwd = request.POST.get('password')
-        m1 = hashlib.sha1()
-        m1.update(pwd.encode('utf8'))
-        pwd = m1.hexdigest()
-        phone = request.POST.get('phone')
-        a = UserInfo.objects.create(username=username, email=email, studentNum=stu_num, password=pwd,
-                                    phone=phone, user_type_id=2)
-
-        a.save()
-        return HttpResponse('OK')
-
-
 # 部门管理
-def classManage(request):
+def department_manage(request):
     (flag, rank) = check_cookie(request)
-    print('flag', flag)
+    print('departmentManage:flag', flag)
     if flag:
         if rank.user_type.caption == 'admin':
-            class_list = ClassInfo.objects.all()
+            class_list = Department.objects.all()
 
-            return render(request, 'classManage.html', {'class_list': class_list})
+            return render(request, 'department_manage.html', {'class_list': class_list})
         else:
-            return render(request, 'class_manage_denied.html')
+            return render(request, 'department_manage_denied.html')
     else:
         return render(request, 'page-login.html', {'error_msg': ''})
 
 
 # 编辑部门
 @csrf_exempt
-def edit_class(request):
+def edit_department(request):
     (flag, rank) = check_cookie(request)
     print('flag', flag)
     if flag:
         if rank.user_type.caption == 'admin':
             if request.method == 'POST':
                 pre_edit_id = request.POST.get('edit_id')
-                class_name = request.POST.get('edit_class_name')
-                temp_flag = ClassInfo.objects.filter(name=class_name)
+                class_name = request.POST.get('edit_department_name')
+                temp_flag = Department.objects.filter(name=class_name)
                 print('pre_edit_id1', pre_edit_id)
-                pre_obj = ClassInfo.objects.get(id=pre_edit_id)
+                pre_obj = Department.objects.get(id=pre_edit_id)
                 if not temp_flag and class_name:
                     pre_obj.name = class_name
                     pre_obj.save()
                 return HttpResponse('部门修改成功')
-            class_list = ClassInfo.objects.all()
-            return render(request, 'classManage.html', {'class_list': class_list})
+            class_list = Department.objects.all()
+            return render(request, 'departmentManage.html', {'class_list': class_list})
             # return HttpResponse('编辑部门')
         else:
-            return render(request, 'class_manage_denied.html')
+            return render(request, 'department_manage_denied.html')
     else:
         return render(request, 'page-login.html', {'error_msg': ''})
 
 
 # 添加部门
 @csrf_exempt
-def add_class(request):
+def add_department(request):
     # print('进来了')
     if request.method == 'POST':
         # print('这是post')
-        add_class_name = request.POST.get('add_class_name')
-        flag = ClassInfo.objects.filter(name=add_class_name)
+        add_department_name = request.POST.get('add_department_name')
+        flag = Department.objects.filter(name=add_department_name)
         if flag:
             pass
             # print('已有数据，不处理')
         else:
-            if add_class_name:
-                ClassInfo.objects.create(name=add_class_name).save()
+            if add_department_name:
+                Department.objects.create(name=add_department_name).save()
 
         return HttpResponse('添加部门成功')
 
 
 # 删除部门
-def delete_class(request):
+def delete_department(request):
     (flag, rank) = check_cookie(request)
     print('flag', flag)
     if flag:
         if rank.user_type.caption == 'admin':
-            # class_list=ClassInfo.objects.all()
+            # class_list=Department.objects.all()
             delete_id = request.GET.get('delete_id')
-            ClassInfo.objects.filter(id=delete_id).delete()
-            return redirect('/classManage/')
+            Department.objects.filter(id=delete_id).delete()
+            return redirect('/departmentManage/')
         else:
-            return render(request, 'class_manage_denied.html')
+            return render(request, 'department_manage_denied.html')
     else:
         return render(request, 'page-login.html', {'error_msg': ''})
 
@@ -357,7 +453,7 @@ def member_manage(request):
     (flag, rank) = check_cookie(request)
     if flag:
         if rank.user_type.caption == 'admin':
-            member_list = UserInfo.objects.all()
+            member_list = Employee.objects.all()
 
             return render(request, 'member_manage.html', {'member_list': member_list})
         else:
@@ -372,8 +468,8 @@ def delete_member(request):
     if flag:
         if rank.user_type.caption == 'admin':
             delete_sno = request.GET.get('delete_sno')
-            UserInfo.objects.get(studentNum=delete_sno).delete()
-            member_list = UserInfo.objects.all()
+            Employee.objects.get(emp_num=delete_sno).delete()
+            member_list = Employee.objects.all()
             return render(request, 'member_manage.html', {'member_list': member_list})
         else:
             return render(request, 'member_manage_denied.html')
@@ -388,7 +484,7 @@ def edit_member(request):
         if rank.user_type.caption == 'admin':
 
             if request.method == 'POST':
-                student_num = request.POST.get('student_num')
+                emp_num = request.POST.get('emp_num')
                 username = request.POST.get('username')
                 email = request.POST.get('email')
                 age = request.POST.get('age')
@@ -398,30 +494,30 @@ def edit_member(request):
                     age = 0
 
                 gender = int(request.POST.get('gender'))
-                cls = ClassInfo.objects.get(name=request.POST.get('cls'))
+                cls = Department.objects.get(name=request.POST.get('cls'))
                 nickname = request.POST.get('nickname')
                 usertype = UserType.objects.get(caption=request.POST.get('user_type'))
                 phone = request.POST.get('phone')
                 motto = request.POST.get('motto')
-                edit_obj = UserInfo.objects.filter(studentNum=student_num)
-                edit_obj.update(studentNum=student_num, username=username, email=email, cid=cls, nickname=nickname,
+                edit_obj = Employee.objects.filter(emp_num=emp_num)
+                edit_obj.update(emp_num=emp_num, username=username, email=email, cid=cls, nickname=nickname,
                                 user_type=usertype, motto=motto,
                                 gender=gender, phone=phone,
                                 age=age
                                 )
-                member_list = UserInfo.objects.all()
+                member_list = Employee.objects.all()
 
                 return redirect('/memberManage/', {'member_list': member_list})
             else:
                 edit_member_id = request.GET.get('edit_sno')
                 # 所有用户类型列表
-                stu_type_list = UserType.objects.all()
+                emp_type_list = UserType.objects.all()
                 # 所有的部门
-                cls_list = ClassInfo.objects.all()
+                cls_list = Department.objects.all()
                 # 所有的专业
                 major_list = MajorInfo.objects.all()
                 # 当前编辑的用户对象
-                edit_stu_obj = UserInfo.objects.get(studentNum=edit_member_id)
+                edit_emp_obj = Employee.objects.get(emp_num=edit_member_id)
                 return render(request, 'edit_member.html', locals())
         else:
             return render(request, 'member_manage_denied.html')
@@ -453,24 +549,6 @@ def noticeManage(request):
         return render(request, 'notice_manage_denied.html')
 
 
-# 请假管理
-@is_login
-def leave(request):
-    (flag, user) = check_cookie(request)
-    leave_list = Leave.objects.all()
-    if request.method == 'POST':
-        starttime = request.POST.get('starttime')
-        endtime = request.POST.get('endtime')
-        print(starttime)
-        a = int(datetime.datetime.strptime(starttime, '%Y-%m-%d').day - datetime.datetime.strptime(endtime,
-                                                                                                   '%Y-%m-%d').day) + 1
-        explain = request.POST.get('explain')
-        Leave.objects.create(start_time=starttime, end_time=endtime, user=user, explain=explain)
-        Attendence.objects.filter(date__gte=starttime, date__lte=endtime, stu=user).update(
-            leave_count=F('leave_count') + a)
-    return render(request, 'leave.html', locals())
-
-
 # 考核记录
 @is_login
 def exam(request):
@@ -492,18 +570,18 @@ def exam_manage(request):
             if title:
                 ExamContent.objects.create(title=title)
             else:
-                count = UserInfo.objects.all().count()
+                count = Employee.objects.all().count()
                 content_id = request.POST.get('exam_id')
                 for i in range(count):
                     point=request.POST.get('point{}'.format(i))
 
-                    stuID=request.POST.get('stu{}'.format(i))
+                    empID=request.POST.get('emp{}'.format(i))
                     detail = request.POST.get('detail{}'.format(i))
-                    Exam.objects.create(point=point,content_id=content_id,user_id=stuID,detail=detail)
+                    Exam.objects.create(point=point,content_id=content_id,user_id=empID,detail=detail)
                 # print(request.body)
                 ExamContent.objects.filter(id=content_id).update(state=True)
         check_list = ExamContent.objects.filter(state=False)
-        user_list = UserInfo.objects.all()
+        user_list = Employee.objects.all()
         return render(request, 'exam_manage.html', locals())
     else:
         return render(request, 'exam_manage_denied.html')

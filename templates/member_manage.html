@@ -37,13 +37,13 @@
                     <tbody>
                     {% for member in member_list %}
                         <tr>
-                            <td>{{ member.studentNum }}</td>
+                            <td>{{ member.emp_num }}</td>
                             <td>{{ member.cid }}</td>
                             <td>{{ member.username }}</td>
                             <td>
                                 <span class="hidden">{{ major.id }}</span>
-                                <a href="/edit_member?edit_sno={{ member.studentNum }}" class="btn btn-info"  id="edit_btn">编辑</a>
-                                <a href="/delete_member?delete_sno={{ member.studentNum }}" class="btn btn-danger">
+                                <a href="/edit_member?edit_sno={{ member.emp_num }}" class="btn btn-info"  id="edit_btn">编辑</a>
+                                <a href="/delete_member?delete_sno={{ member.emp_num }}" class="btn btn-danger">
                                     删除
                                 </a>
                             </td>

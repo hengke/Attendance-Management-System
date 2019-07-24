@@ -1,54 +1,68 @@
 from django.contrib import admin
-from .models import UserInfo, UserType, ClassInfo, MajorInfo, Attendence, Notice, Leave, Exam, ExamContent
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import User
+
+from .models import UserType, Employee, Department, Holidays, Leave, Notice, Signingin
 
 
 # Register your models here.
 
-class UserInfoAdmin(admin.ModelAdmin):
-    list_display = ['studentNum', 'username', 'nickname', 'cid', 'password',
-                    'major', 'gender', 'age', 'phone', 'email', 'motto'
-                    ]
+# class EmployeeAdmin(admin.ModelAdmin):
+#     # list_display = ['employee'.id, 'employee'.username, 'employee'.password, 'emp_num', 'department']
+#     list_display = ['user', 'user_type', 'emp_num', 'department']
+
+
+class EmployeeInline(admin.TabularInline):
+    model = Employee
+    can_delete = False
+    verbose_name_plural = 'employee'
+
+class UserAdmin(UserAdmin):
+    inlines = (EmployeeInline,)
 
 
 class UserTypeAdmin(admin.ModelAdmin):
     list_display = ['id', 'caption']
 
 
-class ClassInfoAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name']
+class DepartmentAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'parent_dept_id']
 
 
-class MajorInfoAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', ]
+class HolidaysAdmin(admin.ModelAdmin):
+    list_display = ['id', 'date', 'holidays_name', 'is_legal_holidays']
 
 
-class AttendenceAdmin(admin.ModelAdmin):
-    list_display = ['id', 'stu', 'date', 'start_time', 'end_time', 'is_leave', 'duration', 'detail']
+class LeaveAdmin(admin.ModelAdmin):
+    list_display = ['id', 'employee', 'leave_id', 'leave_type', 'ask_time',
+                    'report_back_time', 'start_time', 'end_time', 'reason',
+                    'destination', 'approval_id']
+
+
+class SigninginAdmin(admin.ModelAdmin):
+    list_display = ['id', 'employee', 'date', 'start_time', 'end_time', 'is_leave', 'duration', 'detail']
 
 
 class NoticeAdmin(admin.ModelAdmin):
     list_display = ['id', 'author', 'head', 'content', 'level']
 
 
-class LeaveAdmin(admin.ModelAdmin):
-    list_display = ['id', 'start_time', 'end_time', 'explain']
+# class ExamAdmin(admin.ModelAdmin):
+#     list_display = ['id', 'user', 'content', 'point', 'detail']
+#
+#
+# class ExamContentAdmin(admin.ModelAdmin):
+#     list_display = ['id', 'title', 'date', 'state']
 
-
-class ExamAdmin(admin.ModelAdmin):
-    list_display = ['id', 'user', 'content', 'point', 'detail']
-
-
-class ExamContentAdmin(admin.ModelAdmin):
-    list_display = ['id', 'title', 'date', 'state']
-
-
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
 admin.site.register(UserType, UserTypeAdmin)
-admin.site.register(UserInfo, UserInfoAdmin)
-admin.site.register(ClassInfo, ClassInfoAdmin)
-admin.site.register(MajorInfo, MajorInfoAdmin)
-admin.site.register(Attendence, AttendenceAdmin)
+# admin.site.register(Employee, EmployeeAdmin)
+admin.site.register(Department, DepartmentAdmin)
+admin.site.register(Holidays, HolidaysAdmin)
+# admin.site.register(Signingin, SigninginAdmin)
 admin.site.register(Notice, NoticeAdmin)
 admin.site.register(Leave, LeaveAdmin)
-admin.site.register(ExamContent, ExamContentAdmin)
-admin.site.register(Exam, ExamAdmin)
+# admin.site.register(ExamContent, ExamContentAdmin)
+# admin.site.register(Exam, ExamAdmin)
 

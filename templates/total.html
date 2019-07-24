@@ -87,9 +87,9 @@
                     {% for info in info_list %}
                         <tr>
                             <td>{{ forloop.counter }}</td>
-                            <td>{{ info.stu }}</td>
-                            <td>{{ info.stu__username }}</td>
-                            <td>{{ info.stu__cid__name }}</td>
+                            <td>{{ 'info.emp }}</td>
+                            <td>{{ info.emp__username }}</td>
+                            <td>{{ info.emp__cid__name }}</td>
 
                             <td>{{ info.total_time|floatformat:'1' }}</td>
                             <td>{{ info.leave_count|floatformat }}</td>
@@ -113,12 +113,12 @@
                             {#时间数组#}
                             var times=[];
                             for (var i = 0; i < data.length; i++) {
-                                s = "<tr><td>" + i + "</td><td>" + data[i].stu + "</td><td>" + data[i].stu__username + "</td><td>" +
-                                    data[i].stu__cid__name + "</td><td>" +
+                                s = "<tr><td>" + i + "</td><td>" + data[i].emp + "</td><td>" + data[i].emp__username + "</td><td>" +
+                                    data[i].emp__cid__name + "</td><td>" +
                                     data[i].total_time + "</td><td>" +
                                     Number(data[i].leave_count) + "</td></tr>";
                                 $('#time_detail').append(s)
-                                names.push(data[i].stu__username)
+                                names.push(data[i].emp__username)
                                 times.push(data[i].total_time)
 
                             }

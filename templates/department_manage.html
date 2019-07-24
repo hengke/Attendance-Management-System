@@ -92,17 +92,17 @@
             $('#myModal').on('click', '#add_close_model', function (ret) {
 
 
-                $add_class_name = $('#myModal #classnameInput').val()
-                $.post('/add_class/', {'add_class_name': $add_class_name}, function (ret) {
+                $add_department_name = $('#myModal #classnameInput').val()
+                $.post('/add_department/', {'add_department_name': $add_department_name}, function (ret) {
                     alert(ret)
                 })
                 $('#myModal').modal('toggle')
                 window.location.reload(true)
             })
             $('#myModal1').on('click', '#add_close_model', function (ret) {
-                $edit_class_name = $('#myModal1 #classnameInput').val()
-                console.log($edit_class_name)
-                $.post('/edit_class/', {'edit_id':$('table').data('edit_id'),'edit_class_name': $edit_class_name}, function (ret) {
+                $edit_department_name = $('#myModal1 #classnameInput').val()
+                console.log($edit_department_name)
+                $.post('/edit_department/', {'edit_id':$('table').data('edit_id'),'edit_department_name': $edit_department_name}, function (ret) {
                     alert(ret)
                 })
 
@@ -149,13 +149,13 @@
                             <td>{{ class.name }}</td>
                             <td>
                                 <span class="hidden">{{ class.id }}</span>
-                                {#                                <a  href="/edit_class?edit_id={{ class.id }}" >#}
+                                {#                                <a  href="/edit_department?edit_id={{ class.id }}" >#}
                                 <button class="btn btn-info" id="edit_btn" data-toggle="modal" data-target="#myModal1">
                                     编辑
                                 </button>
 
                                 {#                                </a>#}
-                                <a href="/delete_class?delete_id={{ class.id }}">
+                                <a href="/delete_department?delete_id={{ class.id }}">
                                     <button class="btn btn-danger">删除</button>
                                 </a>
                             </td>
@@ -171,10 +171,10 @@
 
                 $('table').on('click', '#edit_btn', function () {
                     $('table').data('edit_id',$(this).prev().text())
-                    {#$.post('/edit_class/', {'edit_id':$(this).prev().text()})#}
-                    $edit_class_name = $(this).parent().prev().text()
-                    {#alert($edit_class_name)#}
-                    $('#myModal1 #classnameInput').val($edit_class_name)
+                    {#$.post('/edit_department/', {'edit_id':$(this).prev().text()})#}
+                    $edit_department_name = $(this).parent().prev().text()
+                    {#alert($edit_department_name)#}
+                    $('#myModal1 #classnameInput').val($edit_department_name)
                 })
 
             </script>

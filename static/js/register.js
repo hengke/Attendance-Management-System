@@ -34,7 +34,7 @@ $(function () {/* 文档加载，执行一个函数*/
                             data: function(t) {
 
                                return {
-                                   stu_num_verify: $('[name="stu_num"]').val()
+                                   emp_num_verify: $('[name="emp_num"]').val()
                                    // whatever: $('[name="whateverNameAttributeInYourForm"]').val()
                                };
                             }
@@ -123,8 +123,8 @@ $(function () {/* 文档加载，执行一个函数*/
                         }
                     }
                 },
-                stu_num: {
-                    message: 'The student number is not valid',
+                emp_num: {
+                    message: 'The 'employee' number is not valid',
                     validators: {
                         notEmpty: {
                             message: '员工编号不能为空'
