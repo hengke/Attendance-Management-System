@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Attendence',
+            name='Attendance',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('start_time', models.DateTimeField(blank=True, null=True)),
@@ -128,7 +128,7 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='app.UserInfo'),
         ),
         migrations.AddField(
-            model_name='attendence',
+            model_name='Attendance',
             name='stu',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='app.UserInfo'),
         ),
