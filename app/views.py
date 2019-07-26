@@ -2,7 +2,7 @@ from django.shortcuts import render, HttpResponse, redirect
 from .forms import loginForm
 from django.contrib.auth import authenticate, login
 from .api import check_cookie, check_login, get_all_major, DecimalEncoder, get_all_class, get_all_type, is_login
-from .models import MajorInfo, UserType, UserInfo, ClassInfo, Attendence, Notice, Leave, ExamContent, Exam
+from .models import MajorInfo, UserType, UserInfo, ClassInfo, Attendance, Notice, Leave, ExamContent, Exam
 # django自带加密解密库
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import F, Q, Avg, Sum, Max, Min, Count
@@ -49,8 +49,8 @@ def total(request):
         firstDay = nowdate - datetime.timedelta(days=weekDay)
         lastDay = nowdate + datetime.timedelta(days=6 - weekDay)
         # print(firstDay,lastDay)
-        # info_list=Attendence.objects.filter(date__gte=firstDay,date__lte=lastDay).values('stu','stu__username','stu__cid__name').annotate(total_time=Sum('duration'),leave_count=Sum('is_leave')).order_by()
-        info_list = Attendence.objects.filter(date__gte=firstDay, date__lte=lastDay).values('stu', 'stu__username',
+        # info_list=Attendance.objects.filter(date__gte=firstDay,date__lte=lastDay).values('stu','stu__username','stu__cid__name').annotate(total_time=Sum('duration'),leave_count=Sum('is_leave')).order_by()
+        info_list = Attendance.objects.filter(date__gte=firstDay, date__lte=lastDay).values('stu', 'stu__username',
                                                                                             'stu__cid__name',
                                                                                             'leave_count') \
             .annotate(total_time=Sum('duration')).order_by()
@@ -65,12 +65,12 @@ def total(request):
         # print(firstDay,lastDay)
         leave_list = Leave.objects.filter().values('user', 'start_time', 'end_time')
         # print(leave_list)
-        info_list = Attendence.objects.filter(date__gte=firstDay, date__lte=lastDay).values('stu', 'stu__username',
+        info_list = Attendance.objects.filter(date__gte=firstDay, date__lte=lastDay).values('stu', 'stu__username',
                                                                                             'stu__cid__name',
                                                                                             'leave_count') \
             .annotate(total_time=Sum('duration')).order_by()
 
-        # info_list=Attendence.objects.filter(date__gte=firstDay,date__lte=lastDay).values('stu','stu__username','stu__cid__name')\
+        # info_list=Attendance.objects.filter(date__gte=firstDay,date__lte=lastDay).values('stu','stu__username','stu__cid__name')\
         #     .annotate(total_time=Sum('duration'),leave_count=Sum('is_leave'))\
         #     .extra(
         #     select={'starttime':"select start_time from app_leave where %s BETWEEN start_time AND end_time"},
@@ -141,9 +141,9 @@ def check(request):
             sign_flag = request.POST.get('sign')
             print('sign_flag', type(sign_flag), sign_flag)
             if sign_flag == 'True':
-                Attendence.objects.create(stu=user, start_time=datetime.datetime.now())
+                Attendance.objects.create(stu=user, start_time=datetime.datetime.now())
             elif sign_flag == 'False':
-                cur_attendent = Attendence.objects.filter(stu=user, end_time=None)
+                cur_attendent = Attendance.objects.filter(stu=user, end_time=None)
                 tmp_time = datetime.datetime.now()
                 duration = round((tmp_time - cur_attendent.last().start_time).seconds / 3600, 1)
 
@@ -151,13 +151,13 @@ def check(request):
             return HttpResponse(request, '操作成功')
         else:
             # 查询上一个签到的状态
-            pre_att = Attendence.objects.filter(stu=user).order_by('id').last()
+            pre_att = Attendance.objects.filter(stu=user).order_by('id').last()
             # print(pre_att.end_time)
             if pre_att:
                 # 如果当前时间距上次签到时间超过六小时，并且上次签退时间等于签到时间
                 if (datetime.datetime.now() - pre_att.start_time.replace(
                         tzinfo=None)).seconds / 3600 > 6 and pre_att.end_time == None:
-                    # Attendence.objects.filter(stu=user, end_time=None).update(end_time=pre_att.start_time+datetime.timedelta(hours=2),duration=2,detail="自动签退")
+                    # Attendance.objects.filter(stu=user, end_time=None).update(end_time=pre_att.start_time+datetime.timedelta(hours=2),duration=2,detail="自动签退")
                     pre_att.delete()
                     sign_flag = True
 
@@ -168,7 +168,7 @@ def check(request):
                     sign_flag = True
             else:
                 sign_flag = True
-            att_list = Attendence.objects.all().order_by('-id')
+            att_list = Attendance.objects.all().order_by('-id')
 
             return render(request, 'check.html', locals())
 
@@ -355,13 +355,15 @@ def edit_major(request):
 # 成员管理
 def member_manage(request):
     (flag, rank) = check_cookie(request)
+    # user = rank
     if flag:
         if rank.user_type.caption == 'admin':
             member_list = UserInfo.objects.all()
-
-            return render(request, 'member_manage.html', {'member_list': member_list})
+            # return render(request, 'member_manage.html', {'member_list': member_list})
         else:
-            return render(request, 'member_manage_denied.html')
+            member_list = [rank]
+            # return render(request, 'member_manage_denied.html')
+        return render(request, 'member_manage.html', {'member_list': member_list})
     else:
         return render(request, 'page-login.html', {'error_msg': ''})
 
@@ -385,7 +387,7 @@ def delete_member(request):
 def edit_member(request):
     (flag, rank) = check_cookie(request)
     if flag:
-        if rank.user_type.caption == 'admin':
+        # if rank.user_type.caption == 'admin':
 
             if request.method == 'POST':
                 student_num = request.POST.get('student_num')
@@ -423,8 +425,8 @@ def edit_member(request):
                 # 当前编辑的用户对象
                 edit_stu_obj = UserInfo.objects.get(studentNum=edit_member_id)
                 return render(request, 'edit_member.html', locals())
-        else:
-            return render(request, 'member_manage_denied.html')
+    # else:
+    #     return render(request, 'member_manage_denied.html')
     else:
         return render(request, 'page-login.html', {'error_msg': ''})
 
@@ -462,11 +464,11 @@ def leave(request):
         starttime = request.POST.get('starttime')
         endtime = request.POST.get('endtime')
         print(starttime)
-        a = int(datetime.datetime.strptime(starttime, '%Y-%m-%d').day - datetime.datetime.strptime(endtime,
-                                                                                                   '%Y-%m-%d').day) + 1
+        a = int(datetime.datetime.strptime(starttime, '%Y-%m-%d').day -
+                datetime.datetime.strptime(endtime, '%Y-%m-%d').day) + 1
         explain = request.POST.get('explain')
         Leave.objects.create(start_time=starttime, end_time=endtime, user=user, explain=explain)
-        Attendence.objects.filter(date__gte=starttime, date__lte=endtime, stu=user).update(
+        Attendance.objects.filter(date__gte=starttime, date__lte=endtime, stu=user).update(
             leave_count=F('leave_count') + a)
     return render(request, 'leave.html', locals())
 
@@ -474,11 +476,11 @@ def leave(request):
 # 考核记录
 @is_login
 def exam(request):
-    exam_list=ExamContent.objects.all()
-    exam_id=request.GET.get('exam_id')
+    exam_list = ExamContent.objects.all()
+    exam_id = request.GET.get('exam_id')
     if exam_id:
-        user_list=Exam.objects.filter(content_id=exam_id).all()
-    return render(request, 'exam.html',locals())
+        user_list = Exam.objects.filter(content_id=exam_id).all()
+    return render(request, 'exam.html', locals())
 
 
 # 考核管理
@@ -495,11 +497,11 @@ def exam_manage(request):
                 count = UserInfo.objects.all().count()
                 content_id = request.POST.get('exam_id')
                 for i in range(count):
-                    point=request.POST.get('point{}'.format(i))
+                    point = request.POST.get('point{}'.format(i))
 
-                    stuID=request.POST.get('stu{}'.format(i))
+                    stu_id = request.POST.get('stu{}'.format(i))
                     detail = request.POST.get('detail{}'.format(i))
-                    Exam.objects.create(point=point,content_id=content_id,user_id=stuID,detail=detail)
+                    Exam.objects.create(point=point, content_id=content_id, user_id=stu_id, detail=detail)
                 # print(request.body)
                 ExamContent.objects.filter(id=content_id).update(state=True)
         check_list = ExamContent.objects.filter(state=False)

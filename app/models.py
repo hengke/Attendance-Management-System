@@ -47,9 +47,10 @@ class UserInfo(models.Model):
     def __str__(self):
         return self.username
 
+
 # 签到表设计
-class Attendence(models.Model):
-    #签到表   字段：用户，签到时间，签退时间，描述   其他是为了方便操作加的字段可不写
+class Attendance(models.Model):
+    # 签到表   字段：用户，签到时间，签退时间，描述   其他是为了方便操作加的字段可不写
     stu = models.ForeignKey('UserInfo', on_delete=models.CASCADE)
     # cur_time = models.DateTimeField(auto_now_add=True)
     start_time = models.DateTimeField(null=True, blank=True)
@@ -82,7 +83,6 @@ class Leave(models.Model):
     start_time = models.DateField(null=True, blank=True)
     end_time = models.DateField(null=True, blank=True)
     explain = models.TextField(default='无', max_length=500)
-
 
 
 # 考核内容

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import UserInfo, UserType, ClassInfo, MajorInfo, Attendence, Notice, Leave, Exam, ExamContent
+from .models import UserInfo, UserType, ClassInfo, MajorInfo, Attendance, Notice, Leave, Exam, ExamContent
 
 
 # Register your models here.
@@ -22,7 +22,7 @@ class MajorInfoAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', ]
 
 
-class AttendenceAdmin(admin.ModelAdmin):
+class AttendanceAdmin(admin.ModelAdmin):
     list_display = ['id', 'stu', 'date', 'start_time', 'end_time', 'is_leave', 'duration', 'detail']
 
 
@@ -46,7 +46,7 @@ admin.site.register(UserType, UserTypeAdmin)
 admin.site.register(UserInfo, UserInfoAdmin)
 admin.site.register(ClassInfo, ClassInfoAdmin)
 admin.site.register(MajorInfo, MajorInfoAdmin)
-admin.site.register(Attendence, AttendenceAdmin)
+admin.site.register(Attendance, AttendanceAdmin)
 admin.site.register(Notice, NoticeAdmin)
 admin.site.register(Leave, LeaveAdmin)
 admin.site.register(ExamContent, ExamContentAdmin)
