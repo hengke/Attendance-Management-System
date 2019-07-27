@@ -14,7 +14,7 @@
                 <h2 class="panel-title">请假申请</h2>
             </div>
             <div class="panel-body">
-                <form id="defaultForm" role="form" class="form-signin form-horizontal" action="/leave/" method="post">
+                <form id="defaultForm" role="form" class="form-signin form-horizontal" action="/LeaveAsk/" method="post">
                     {% csrf_token %}
                     <div class="form-group">
                         <label for="leaveType" class="col-sm-4 control-label">假别：</label>
@@ -80,45 +80,7 @@
             });
         })
     </script>
-{#    <div class="jumbotron">#}
-    <div class="panel panel-primary">
-        <div class="panel-heading">
-            <h3 class="panel-title">请假记录</h3>
-        </div>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>假单编号</th>
-                    <th>员工编号</th>
-                    <th>姓名</th>
-                    <th>申请时间</th>
-                    <th>假别</th>
-                    <th>开始时间</th>
-                    <th>结束时间</th>
-                    <th>请假天数</th>
-                    <th>销假时间</th>
-                    <th>请假原因</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for att in leave_list %}
-                <tr>
-                    <td>{{ att.leave_id }}</td>
-                    <td>{{ att.employee.emp_num }}</td>
-                    <td>{{ att.employee.full_name }}</td>
-                    <td>{{ att.ask_time }}</td>
-                    <td>{{ att.leave_type }}</td>
-                    <td>{{ att.start_time }}</td>
-                    <td>{{ att.end_time }}</td>
-                    <td>{{ att.leave_days }}</td>
-                    <td>{{ att.report_back_time }}</td>
-                    <td>{{ att.reason }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
+
 {% endblock content %}
 {% block sidebar %}
     6

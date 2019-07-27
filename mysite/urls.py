@@ -43,7 +43,9 @@ urlpatterns = [
     url(r'^sign_solve/', views.total),
     url(r'^notice/', views.notice),
     url(r'^noticeManage/', views.noticeManage),
-    url(r'^leave/', views.leave),
+    url(r'^LeaveAsk/', views.leave_ask),
+    url(r'^LeaveReportBack/', views.leave_report_back),
+    url(r'^LeaveQuery/', views.leave_query),
     # url(r'^exam/',views.exam),
     # url(r'^exam_manage/',views.exam_manage),
 ]

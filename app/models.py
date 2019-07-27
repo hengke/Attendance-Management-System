@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-# from datetime import datetime
+from datetime import datetime
 from django.utils import timezone
 
 
@@ -62,7 +62,7 @@ class Holidays(models.Model):
 class Leave(models.Model):
     # 请假表 字段：用户，假单编号，假别，请假时间，销假时间，开始时间，结束时间，请假原因，目的地，审批单编号
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    leave_id = models.TextField(max_length=255, verbose_name='假单编号')  # 例子：JDYT-YJY-LEAVE-2019070811151562555730
+    leave_id = models.TextField(max_length=255, verbose_name='假单编号')  # 例子：2019070811151562555730，datetime.datetime.now().strftime('%Y%m%d%s%f')
     leave_type = models.TextField(max_length=100, verbose_name='假别')  # 假别
     ask_time = models.DateField(null=False, blank=True, verbose_name='请假时间')  # 请假时间
     report_back_time = models.DateField(null=True, blank=True, verbose_name='销假时间')  # 销假时间
@@ -70,7 +70,22 @@ class Leave(models.Model):
     end_time = models.DateField(null=False, blank=True, verbose_name='结束时间')  # 结束时间
     reason = models.TextField(default='无', max_length=500, verbose_name='请假原因')   # 请假原因
     destination = models.TextField(null=True, max_length=100, verbose_name='目的地')  # 目的地
-    approval_id = models.TextField(max_length=255, verbose_name='审批单编号')  # 例子：JDYT-YJY-Approval-2019070811151562555730
+    approval_id = models.TextField(max_length=255, verbose_name='审批单编号')  # 例子：2019070811151562555730，datetime.datetime.now().strftime('%Y%m%d%s%f')
+
+    def __str__(self):
+        return self.leave_id
+
+    def _get_leave_days(self):
+        if self.report_back_time and self.report_back_time < self.end_time:
+            # if self.report_back_time < self.end_time:
+                return '%d' % ((self.report_back_time - self.start_time).days + 1)
+
+        return '%d' % ((self.end_time - self.start_time).days + 1)
+
+    class Meta:
+        ordering = ['ask_time']
+
+    leave_days = property(_get_leave_days)
 
 
 # 考勤记录表

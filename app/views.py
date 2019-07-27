@@ -131,17 +131,18 @@ def edit_emp_info(request):
     (flag, rank) = check_cookie(request)
     # print('check：flag', flag)
     # print('check：rank', rank)
-    username = rank
+    user = rank
+    emp = Employee.objects.get(user=user)
+    # 所有用户类型列表
+    user_type_list = UserType.objects.all()
+    # 所有的部门
+    dept_list = Department.objects.all()
 
     if request.method == 'POST':
-        username = request.POST.get('username')
-        user = User.objects.get(username=username)
-
+        user = User.objects.get(username=request.POST.get('username'))
         emp_num = request.POST.get('emp_num')
-        department_name = request.POST.get('department')
-        department = Department.objects.get(name=department_name)
-        user_type = UserType.objects.get(caption="普通员工")
-
+        department = Department.objects.get(name=request.POST.get('department'))
+        user_type = UserType.objects.get(caption=request.POST.get('user_type'))
         full_name = request.POST.get('full_name')
         gender = request.POST.get('gender')
         birth_date = request.POST.get('birth_date')
@@ -155,31 +156,30 @@ def edit_emp_info(request):
             emp.emp_num = emp_num
             emp.full_name = full_name
             emp.department = department
+            emp.user_type = user_type
             emp.gender = gender
             emp.birth_date = birth_date
             emp.work_phone = work_phone
             emp.cell_phone = cell_phone
         except Employee.DoesNotExist:
-            emp = Employee.objects.create(user=user, emp_num=emp_num, full_name=full_name,
-                                          department=department,
+            emp = Employee.objects.create(user=user, emp_num=emp_num, full_name=full_name, department=department,
                                           gender=gender, birth_date=birth_date, work_phone=work_phone,
-                                          user_type=user_type,
-                                          cell_phone=cell_phone)
+                                          user_type=user_type, cell_phone=cell_phone)
 
         emp.save()
-        # return HttpResponse('OK')
-        return render(request, 'check.html', locals())
-    else:
-        user = User.objects.get(username=username)
-        emp = Employee.objects.get(user=user)
-        return render(request, 'edit_emp_info.html', locals())
+        return render(request, 'show_emp_info.html', locals())
+
+    return render(request, 'edit_emp_info.html', locals())
 
 
-# 请假管理
+# 请假申请
 @is_login
-def leave(request):
-    (flag, username) = check_cookie(request)
-    leave_list = Leave.objects.all()
+def leave_ask(request):
+    (flag, user) = check_cookie(request)
+    # user = User.objects.get(username=username)
+    emp = Employee.objects.get(user=user)
+    leave_list = Leave.objects.filter(employee=emp)
+
     if request.method == 'POST':
         leavetype = request.POST.get('leavetype')
         starttime = request.POST.get('starttime')
@@ -189,21 +189,43 @@ def leave(request):
 
         # now = datetime.datetime.now().strftime('%Y%m%d%s%f')
         ask_time = datetime.datetime.now()
-        leave_id = "JDYT-YJY-LEAVE-" + datetime.datetime.now().strftime('%Y%m%d%s%f')
-        approval_id = "JDYT-YJY-Approval-" + datetime.datetime.now().strftime('%Y%m%d%s%f')
-
-        user = User.objects.get(username=username)
-        emp = Employee.objects.get(user=user)
-
-        print(starttime)
+        # print(ask_time)
+        # idd = ask_time.strftime('%Y%m%d%s%f')
+        # print(idd)
+        leave_id = datetime.datetime.now().strftime('%Y%m%d%s%f')
+        approval_id = datetime.datetime.now().strftime('%Y%m%d%s%f')
 
         Leave.objects.create(employee=emp, leave_id=leave_id, leave_type=leavetype, ask_time=ask_time, start_time=starttime,
                              end_time=endtime, reason=reason, destination=destination, approval_id=approval_id)
-        a = int(datetime.datetime.strptime(starttime, '%Y-%m-%d').day -
-                datetime.datetime.strptime(endtime, '%Y-%m-%d').day) + 1
-        Signingin.objects.filter(date__gte=starttime, date__lte=endtime, emp=user).update(
-            leave_count=F('leave_count') + a)
-    return render(request, 'leave.html', locals())
+        # a = int(datetime.datetime.strptime(starttime, '%Y-%m-%d').day -
+        #         datetime.datetime.strptime(endtime, '%Y-%m-%d').day) + 1
+        # Signingin.objects.filter(date__gte=starttime, date__lte=endtime, emp=user).update(
+        #     leave_count=F('leave_count') + a)
+    return render(request, 'leaveask.html', locals())
+
+
+# 销假管理
+@is_login
+def leave_report_back(request):
+    (flag, user) = check_cookie(request)
+    emp = Employee.objects.get(user=user)
+
+    if request.method == 'POST':
+        leave_id = request.POST.get('leave_id')
+        leave = Leave.objects.get(leave_id=leave_id)
+        leave.report_back_time = datetime.datetime.now()
+        leave.save()
+    leave_list = Leave.objects.filter(employee=emp)
+    return render(request, 'LeaveQuery.html', locals())
+
+
+# 请假查询
+@is_login
+def leave_query(request):
+    (flag, user) = check_cookie(request)
+    emp = Employee.objects.get(user=user)
+    leave_list = Leave.objects.filter(employee=emp)
+    return render(request, 'LeaveQuery.html', locals())
 
 
 # 注销登录
