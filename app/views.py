@@ -216,7 +216,7 @@ def leave_report_back(request):
         leave.report_back_time = datetime.datetime.now()
         leave.save()
     leave_list = Leave.objects.filter(employee=emp)
-    return render(request, 'LeaveQuery.html', locals())
+    return render(request, 'leavequery.html', locals())
 
 
 # 请假查询
@@ -225,7 +225,7 @@ def leave_query(request):
     (flag, user) = check_cookie(request)
     emp = Employee.objects.get(user=user)
     leave_list = Leave.objects.filter(employee=emp)
-    return render(request, 'LeaveQuery.html', locals())
+    return render(request, 'leavequery.html', locals())
 
 
 # 注销登录
