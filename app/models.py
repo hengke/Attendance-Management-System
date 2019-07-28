@@ -58,12 +58,19 @@ class Holidays(models.Model):
     is_legal_holidays = models.BooleanField(default=False, verbose_name='是否法定节假日')
 
 
+# 假别
+class LeaveType(models.Model):
+    name = models.TextField(max_length=20, verbose_name='假别')
+
+    def __str__(self):
+        return self.name
+
 # 请假表
 class Leave(models.Model):
     # 请假表 字段：用户，假单编号，假别，请假时间，销假时间，开始时间，结束时间，请假原因，目的地，审批单编号
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     leave_id = models.TextField(max_length=255, verbose_name='假单编号')  # 例子：2019070811151562555730，datetime.datetime.now().strftime('%Y%m%d%s%f')
-    leave_type = models.TextField(max_length=100, verbose_name='假别')  # 假别
+    leave_type = models.ForeignKey(LeaveType, verbose_name='假别', on_delete=models.CASCADE)  # 假别
     ask_time = models.DateField(null=False, blank=True, verbose_name='请假时间')  # 请假时间
     report_back_time = models.DateField(null=True, blank=True, verbose_name='销假时间')  # 销假时间
     start_time = models.DateField(null=False, blank=True, verbose_name='开始时间')  # 开始时间

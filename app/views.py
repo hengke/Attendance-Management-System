@@ -228,6 +228,15 @@ def leave_query(request):
     return render(request, 'leavequery.html', locals())
 
 
+# 假别设置
+# @is_login
+def set_leave_type(request):
+    leave_type_list = LeaveType.objects.all()
+    if request.method == 'POST':
+        pass
+    return render(request, 'set_leave_type.html', locals())
+
+
 # 注销登录
 def logout(request):
     req = redirect('/login/')

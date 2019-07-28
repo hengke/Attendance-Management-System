@@ -46,6 +46,7 @@ urlpatterns = [
     url(r'^LeaveAsk/', views.leave_ask),
     url(r'^LeaveReportBack/', views.leave_report_back),
     url(r'^LeaveQuery/', views.leave_query),
+    # url(r'^SetLeaveType/', views.set_leave_type),
     # url(r'^exam/',views.exam),
     # url(r'^exam_manage/',views.exam_manage),
 ]

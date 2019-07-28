@@ -3,6 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
 from .models import UserType, Employee, Department, Holidays, Leave, Notice, Signingin
+from .models import WorkOvertime, LeaveType
 
 
 # Register your models here.
@@ -39,13 +40,21 @@ class LeaveAdmin(admin.ModelAdmin):
                     'destination', 'approval_id']
 
 
-class SigninginAdmin(admin.ModelAdmin):
-    list_display = ['id', 'employee', 'date', 'start_time', 'end_time', 'is_leave', 'duration', 'detail']
+# class SigninginAdmin(admin.ModelAdmin):
+#     list_display = ['id', 'employee', 'date', 'start_time', 'end_time', 'is_leave', 'duration', 'detail']
 
 
 class NoticeAdmin(admin.ModelAdmin):
     list_display = ['id', 'author', 'head', 'content', 'level']
 
+
+class LeaveTypeAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name']
+
+
+class WorkOvertimeAmin(admin.ModelAdmin):
+    list_display = ['employee', 'start_time', 'end_time', 'duration']
+ 
 
 # class ExamAdmin(admin.ModelAdmin):
 #     list_display = ['id', 'user', 'content', 'point', 'detail']
@@ -63,6 +72,8 @@ admin.site.register(Holidays, HolidaysAdmin)
 # admin.site.register(Signingin, SigninginAdmin)
 admin.site.register(Notice, NoticeAdmin)
 admin.site.register(Leave, LeaveAdmin)
+admin.site.register(LeaveType, LeaveTypeAdmin)
+admin.site.register(WorkOvertime, WorkOvertimeAmin)
 # admin.site.register(ExamContent, ExamContentAdmin)
 # admin.site.register(Exam, ExamAdmin)
 
