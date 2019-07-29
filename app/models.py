@@ -30,7 +30,7 @@ class HolidayName(models.Model):
 class HolidayArrangements(models.Model):
     date = models.DateField(null=False, verbose_name='日期')
     name = models.ForeignKey(to='HolidayName', on_delete=models.CASCADE, verbose_name='假期名称')
-    is_legal_holidays = models.BooleanField(default=False, verbose_name='是否法定节假日')
+    is_legal_holiday = models.BooleanField(default=False, verbose_name='是否法定节假日')
 
 
 # 休假类别
@@ -118,16 +118,26 @@ class Leave(models.Model):
 
 # 考勤记录表
 class Attendance(models.Model):
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, verbose_name='员工')
+    date = models.DateField(default=timezone.now, verbose_name='日期')
+    shift = models.ForeignKey(WorkTime, on_delete=models.CASCADE, verbose_name='班次')
+    state = models.TextField(default="出勤", max_length=20, blank=False, verbose_name='考勤状态')
+    is_night_work_overtime = models.BooleanField(default=False, verbose_name='是否夜加班')
+    is_work_overtime = models.BooleanField(default=False, verbose_name='是否加班')
+    is_legal_holiday = models.BooleanField(default=False, verbose_name='是否法定节假日加班')
+    is_leave = models.BooleanField(default=False, verbose_name='是否休假')
+    remarks = models.TextField(default='', verbose_name='备注')
+    # 加班：夜班，加班，节日加班
+    # 请假：
+    # 迟到
+    # 早退
+    # 旷工
+    # 补签，补签同意
     # cur_time = models.DateTimeField(auto_now_add=True)
-    start_time = models.DateTimeField(null=True, blank=True)
-    end_time = models.DateTimeField(null=True, blank=True)
-    duration = models.DecimalField(max_digits=5, decimal_places=2, default=0)
-    date = models.DateField(default=timezone.now)
-    # state=models.BooleanField(default=False)
-    is_leave = models.BooleanField(default=False)
-    detail = models.TextField(default='', verbose_name='备注')
-    leave_count = models.IntegerField(default=0, verbose_name='请假天数')
+    # start_time = models.DateTimeField(null=True, blank=True)
+    # end_time = models.DateTimeField(null=True, blank=True)
+    # duration = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    # leave_count = models.IntegerField(default=0, verbose_name='请假天数')
 
     def __str__(self):
         return self.employee.user.username

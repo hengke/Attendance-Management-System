@@ -2,16 +2,13 @@ from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth.models import User
 from .forms import loginForm
 from django.contrib.auth import authenticate, login
-from .api import check_cookie, check_login, DecimalEncoder, get_all_department, get_all_type, is_login
+from .api import check_cookie, DecimalEncoder, is_login
 from .models import UserType, Employee, Department, Notice, Leave, HolidayArrangements, Signingin, LeaveType
 # django自带加密解密库
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import F, Q, Avg, Sum, Max, Min, Count
 import json
-import hashlib
-import json
 import datetime
-import pytz
 
 
 # Create your views here.
@@ -50,15 +47,13 @@ def login(request):
         if user is not None:
             if user.is_active:
                 try:
-                    # print("user.is_active:", user.is_active)
+                    # 尝试获取此用户名对应的员工，有则跳到签到页面，没有则跳转到员工信息编辑页面
                     emp = Employee.objects.get(user=user)
-                    # print("login:", emp)
                     response = redirect('/index/')
                     response.set_cookie('qwer', username, 3600)
                     response.set_cookie('asdf', password, 3600)
                     return response
                 except Employee.DoesNotExist:
-                    # print("Employee.DoesNotExist:", Employee.DoesNotExist)
                     return render(request, 'edit_emp_info.html', locals())
             else:
                 return render(request, 'page-login.html', {'error_msg': '账户未激活！请联系管理员！'})
@@ -66,7 +61,6 @@ def login(request):
             return render(request, 'page-login.html', {'error_msg': '账号或密码错误请重新输入'})
     else:
         (flag, rank) = check_cookie(request)
-        print('flag', flag)
         if flag:
             return redirect('/index/')
         return render(request, 'page-login.html', {'error_msg': ''})
@@ -74,27 +68,55 @@ def login(request):
 
 def check(request):
     (flag, rank) = check_cookie(request)
-    # print('check：flag', flag)
-    # print('check：rank', rank)
-    username = rank
+    # get cur_day cur_time
+    # if cur_day is workday:
+    #     is_workday = True
+    # else:
+    #     is_workday = False
+    #
+    # if cur_day is legal_holiday:
+    #     is_legal_holidays = True
+    # else:
+    #     is_legal_holidays = False
+    #
+    # if cur_time is worktime:
+    #     is_worktime = True
+    # else:
+    #     is_worktime = False
+    #
+    # if 员工在休假中:
+    #     is_in_leaving = True
+    # else:
+    #     is_in_leaving = False
 
-
-    if flag:
+    if flag:  # flag为True时，rank为user
+        #
+        # if workday and worktime:
+        #     if not is_in_leaving:
+        #         签到
+        #     else:
+        #         提示正在休假中，显示当前休假详情
+        #         询问是否加班，还是提前销假
+        #         加班：
+        #             签到，并创建加班记录，填写加班内容，备注休假中途加班
+        #         提前销假：
+        #             跳转到销假页面
+        # else if is_legal_holidays:
+        #     签到，并创建加班记录，填写加班内容，备注节日加班
+        # else:
+        #     签到，并创建加班记录，填写加班内容，备注普通加班
         try:
-            user = User.objects.get(username=username)
-            try:
-                emp = Employee.objects.get(user=user)
-            except Employee.DoesNotExist:
-                emp = None
-        except User.DoesNotExist:
-            user = None
+            emp = Employee.objects.get(user=rank)
+        except Employee.DoesNotExist:
+            emp = None
+            return render(request, 'edit_emp_info.html', locals())
 
         if request.method == 'POST':
             sign_flag = request.POST.get('sign')
             # print('check:sign_flag', type(sign_flag), sign_flag)
-            if sign_flag == 'True':
+            if sign_flag == 'True':  # 签到，创建记录
                 Signingin.objects.create(employee=emp, start_time=datetime.datetime.now())
-            elif sign_flag == 'False':
+            elif sign_flag == 'False':  # 签退，更新签退时间和时长
                 cur_attendent = Signingin.objects.filter(employee=emp, end_time=None)
                 tmp_time = datetime.datetime.now()
                 duration = round((tmp_time - cur_attendent.last().start_time).seconds / 3600, 1)
@@ -103,7 +125,7 @@ def check(request):
             return HttpResponse(request, '操作成功')
         else:
             # 查询上一个签到的状态
-            pre_att = Signingin.objects.filter(employee=emp).order_by('id').last()
+            pre_att = Signingin.objects.filter(employee=emp).order_by('start_time').last()
             # print('check:pre_att', pre_att)
             if pre_att:
                 # 如果当前时间距上次签到时间超过六小时，并且上次签退时间等于签到时间
@@ -120,10 +142,9 @@ def check(request):
             else:
                 sign_flag = True
             att_list = Signingin.objects.all().order_by('-id')
-
             return render(request, 'check.html', locals())
-
-    return render(request, 'page-login.html', {'error_msg': ''})
+    else:
+        return render(request, 'page-login.html', {'error_msg': ''})
 
 
 # 编辑员工信息
