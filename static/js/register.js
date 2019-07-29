@@ -34,7 +34,7 @@ $(function () {/* 文档加载，执行一个函数*/
                             data: function(t) {
 
                                return {
-                                   emp_num_verify: $('[name="emp_num"]').val()
+                                   emp_num_verify: $('[name="username"]').val()
                                    // whatever: $('[name="whateverNameAttributeInYourForm"]').val()
                                };
                             }
@@ -124,7 +124,7 @@ $(function () {/* 文档加载，执行一个函数*/
                     }
                 },
                 emp_num: {
-                    message: 'The 'employee' number is not valid',
+                    message: 'The "employee" number is not valid',
                     validators: {
                         notEmpty: {
                             message: '员工编号不能为空'
@@ -132,10 +132,10 @@ $(function () {/* 文档加载，执行一个函数*/
                         stringLength: {
                             min: 11,
                             max: 11,
-                            message: '请输入11位员工编号（不足11位首位用x填充）'
+                            message: '请输入8位员工编号（不足11位首位用0填充）'
                         },
                         regexp: {
-                            regexp: /^(x?[0-9]){10}|([0-9]{11})$/,
+                            regexp: /^(0?[0-9]){10}|([0-9]{11})$/,
                             message: '请输入正确的员工编号'
                         }
                     }

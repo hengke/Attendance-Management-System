@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from .forms import loginForm
 from django.contrib.auth import authenticate, login
 from .api import check_cookie, check_login, DecimalEncoder, get_all_department, get_all_type, is_login
-from .models import UserType, Employee, Department, Notice, Leave, Holidays, Signingin
+from .models import UserType, Employee, Department, Notice, Leave, HolidayArrangements, Signingin, LeaveType
 # django自带加密解密库
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import F, Q, Avg, Sum, Max, Min, Count
@@ -172,33 +172,65 @@ def edit_emp_info(request):
     return render(request, 'edit_emp_info.html', locals())
 
 
-# 请假管理
+# 请假申请
 @is_login
-def leave(request):
+def leave_ask(request):
     (flag, user) = check_cookie(request)
     # user = User.objects.get(username=username)
     emp = Employee.objects.get(user=user)
-    leave_list = Leave.objects.all()
+    leave_list = Leave.objects.filter(employee=emp)
+    leave_type_list = LeaveType.objects.all()
 
     if request.method == 'POST':
-        leavetype = request.POST.get('leavetype')
+        leavetype = request.POST.get('leaveType')
+        leave_type = LeaveType.objects.get(name=leavetype)
         starttime = request.POST.get('starttime')
         endtime = request.POST.get('endtime')
         destination = request.POST.get('destination')
         reason = request.POST.get('reason')
 
-        # now = datetime.datetime.now().strftime('%Y%m%d%s%f')
         ask_time = datetime.datetime.now()
-        leave_id = "JDYT-YJY-LEAVE-" + datetime.datetime.now().strftime('%Y%m%d%s%f')
-        approval_id = "JDYT-YJY-Approval-" + datetime.datetime.now().strftime('%Y%m%d%s%f')
+        leave_id = datetime.datetime.now().strftime('%Y%m%d%s%f')
+        approval_id = datetime.datetime.now().strftime('%Y%m%d%s%f')
 
-        Leave.objects.create(employee=emp, leave_id=leave_id, leave_type=leavetype, ask_time=ask_time, start_time=starttime,
+        Leave.objects.create(employee=emp, leave_id=leave_id, leave_type=leave_type, ask_time=ask_time, start_time=starttime,
                              end_time=endtime, reason=reason, destination=destination, approval_id=approval_id)
-        # a = int(datetime.datetime.strptime(starttime, '%Y-%m-%d').day -
-        #         datetime.datetime.strptime(endtime, '%Y-%m-%d').day) + 1
-        # Signingin.objects.filter(date__gte=starttime, date__lte=endtime, emp=user).update(
-        #     leave_count=F('leave_count') + a)
-    return render(request, 'leave.html', locals())
+        return render(request, 'leavequery.html', locals())
+
+    return render(request, 'leaveask.html', locals())
+
+
+# 销假管理
+@is_login
+def leave_report_back(request):
+    (flag, user) = check_cookie(request)
+    emp = Employee.objects.get(user=user)
+
+    if request.method == 'POST':
+        leave_id = request.POST.get('leave_id')
+        leave = Leave.objects.get(leave_id=leave_id)
+        leave.report_back_time = datetime.datetime.now()
+        leave.save()
+    leave_list = Leave.objects.filter(employee=emp)
+    return render(request, 'leavequery.html', locals())
+
+
+# 请假查询
+@is_login
+def leave_query(request):
+    (flag, user) = check_cookie(request)
+    emp = Employee.objects.get(user=user)
+    leave_list = Leave.objects.filter(employee=emp)
+    return render(request, 'leavequery.html', locals())
+
+
+# 假别设置
+# @is_login
+# def set_leave_type(request):
+#     leave_type_list = LeaveType.objects.all()
+#     if request.method == 'POST':
+#         pass
+#     return render(request, 'set_leave_type.html', locals())
 
 
 # 注销登录
@@ -215,8 +247,9 @@ def register(request):
     if request.method == 'POST':
         if request.is_ajax():
 
-            emp_num_v = request.POST.get('emp_num_verify')
-            if Employee.objects.filter(emp_num=emp_num_v):
+            emp_num = request.POST.get('emp_num')
+            username = request.POST.get('username')
+            if Employee.objects.filter(emp_num=emp_num) or User.objects.filter(username=username):
                 ret = {'valid': False}
             else:
                 ret = {'valid': True}
@@ -233,16 +266,16 @@ def register_verify(request):
         print('验证成功')
         username = request.POST.get('username')
         email = request.POST.get('email')
-        emp_num = request.POST.get('emp_num')
         pwd = request.POST.get('password')
-        m1 = hashlib.sha1()
-        m1.update(pwd.encode('utf8'))
-        pwd = m1.hexdigest()
-        phone = request.POST.get('phone')
-        a = Employee.objects.create(username=username, email=email, emp_num=emp_num, password=pwd,
-                                    phone=phone, user_type_id=2)
+        user = User.objects.create_user(username, email, pwd)
+        # user.is_superuser = False
 
-        a.save()
+        user.save()
+
+        emp_num = request.POST.get('emp_num')
+        emp = Employee.objects.create(user=user, emp_num=emp_num, user_type_id=2)
+
+        emp.save()
         return HttpResponse('OK')
 
 
@@ -293,290 +326,290 @@ def total(request):
     #     return render(request, 'page-login.html', {'error_msg': ''})
 
 
-# 部门管理
-def department_manage(request):
-    (flag, rank) = check_cookie(request)
-    print('departmentManage:flag', flag)
-    if flag:
-        if rank.user_type.caption == 'admin':
-            class_list = Department.objects.all()
-
-            return render(request, 'department_manage.html', {'class_list': class_list})
-        else:
-            return render(request, 'department_manage_denied.html')
-    else:
-        return render(request, 'page-login.html', {'error_msg': ''})
-
-
-# 编辑部门
-@csrf_exempt
-def edit_department(request):
-    (flag, rank) = check_cookie(request)
-    print('flag', flag)
-    if flag:
-        if rank.user_type.caption == 'admin':
-            if request.method == 'POST':
-                pre_edit_id = request.POST.get('edit_id')
-                class_name = request.POST.get('edit_department_name')
-                temp_flag = Department.objects.filter(name=class_name)
-                print('pre_edit_id1', pre_edit_id)
-                pre_obj = Department.objects.get(id=pre_edit_id)
-                if not temp_flag and class_name:
-                    pre_obj.name = class_name
-                    pre_obj.save()
-                return HttpResponse('部门修改成功')
-            class_list = Department.objects.all()
-            return render(request, 'departmentManage.html', {'class_list': class_list})
-            # return HttpResponse('编辑部门')
-        else:
-            return render(request, 'department_manage_denied.html')
-    else:
-        return render(request, 'page-login.html', {'error_msg': ''})
-
-
-# 添加部门
-@csrf_exempt
-def add_department(request):
-    # print('进来了')
-    if request.method == 'POST':
-        # print('这是post')
-        add_department_name = request.POST.get('add_department_name')
-        flag = Department.objects.filter(name=add_department_name)
-        if flag:
-            pass
-            # print('已有数据，不处理')
-        else:
-            if add_department_name:
-                Department.objects.create(name=add_department_name).save()
-
-        return HttpResponse('添加部门成功')
-
-
-# 删除部门
-def delete_department(request):
-    (flag, rank) = check_cookie(request)
-    print('flag', flag)
-    if flag:
-        if rank.user_type.caption == 'admin':
-            # class_list=Department.objects.all()
-            delete_id = request.GET.get('delete_id')
-            Department.objects.filter(id=delete_id).delete()
-            return redirect('/departmentManage/')
-        else:
-            return render(request, 'department_manage_denied.html')
-    else:
-        return render(request, 'page-login.html', {'error_msg': ''})
-
-
-# 专业管理
-def majorManage(request):
-    (flag, rank) = check_cookie(request)
-    if flag:
-        if rank.user_type.caption == 'admin':
-            major_list = MajorInfo.objects.all()
-
-            return render(request, 'major_manage.html', {'major_list': major_list})
-        else:
-            return render(request, 'major_manage_denied.html')
-    else:
-        return render(request, 'page-login.html', {'error_msg': ''})
-
-
-# 添加专业
-@csrf_exempt
-def add_major(request):
-    (flag, rank) = check_cookie(request)
-    if flag:
-        if rank.user_type.caption == 'admin':
-            major_list = MajorInfo.objects.all()
-            if request.method == 'POST':
-
-                add_major_name = request.POST.get('add_major_name')
-                print(add_major_name)
-                if not MajorInfo.objects.filter(name=add_major_name):
-                    new_major = MajorInfo.objects.create(name=add_major_name)
-                return HttpResponse('专业添加成功')
-
-            return render(request, 'major_manage.html', {'major_list': major_list})
-        else:
-            return render(request, 'major_manage_denied.html')
-    else:
-        return render(request, 'page-login.html', {'error_msg': ''})
-
-
-# 删除专业
-def delete_major(request):
-    (flag, rank) = check_cookie(request)
-    if flag:
-        if rank.user_type.caption == 'admin':
-
-            delete_major_id = request.GET.get('delete_id')
-            MajorInfo.objects.get(id=delete_major_id).delete()
-            major_list = MajorInfo.objects.all()
-            return render(request, 'major_manage.html', {'major_list': major_list})
-        else:
-            return render(request, 'major_manage_denied.html')
-    else:
-        return render(request, 'page-login.html', {'error_msg': ''})
-
-
-# 编辑专业
-@csrf_exempt
-def edit_major(request):
-    (flag, rank) = check_cookie(request)
-    if flag:
-        if rank.user_type.caption == 'admin':
-            major_list = MajorInfo.objects.all()
-            edit_major_id = request.POST.get('edit_major_id')
-            edit_major_name = request.POST.get('edit_major_name')
-            print(edit_major_id)
-            print(edit_major_name)
-            if not MajorInfo.objects.filter(name=edit_major_name):
-                change_obj = MajorInfo.objects.get(id=edit_major_id)
-                change_obj.name = edit_major_name
-                change_obj.save()
-            return HttpResponse('专业修改成功')
-
-        else:
-            return render(request, 'major_manage_denied.html')
-    else:
-        return render(request, 'page-login.html', {'error_msg': ''})
-
-
-# 成员管理
-def member_manage(request):
-    (flag, rank) = check_cookie(request)
-    if flag:
-        if rank.user_type.caption == 'admin':
-            member_list = Employee.objects.all()
-
-            return render(request, 'member_manage.html', {'member_list': member_list})
-        else:
-            return render(request, 'member_manage_denied.html')
-    else:
-        return render(request, 'page-login.html', {'error_msg': ''})
-
-
-# 删除成员
-def delete_member(request):
-    (flag, rank) = check_cookie(request)
-    if flag:
-        if rank.user_type.caption == 'admin':
-            delete_sno = request.GET.get('delete_sno')
-            Employee.objects.get(emp_num=delete_sno).delete()
-            member_list = Employee.objects.all()
-            return render(request, 'member_manage.html', {'member_list': member_list})
-        else:
-            return render(request, 'member_manage_denied.html')
-    else:
-        return render(request, 'page-login.html', {'error_msg': ''})
-
-
-#   编辑成员
-def edit_member(request):
-    (flag, rank) = check_cookie(request)
-    if flag:
-        if rank.user_type.caption == 'admin':
-
-            if request.method == 'POST':
-                emp_num = request.POST.get('emp_num')
-                username = request.POST.get('username')
-                email = request.POST.get('email')
-                age = request.POST.get('age')
-                if age:
-                    age = int(age)
-                else:
-                    age = 0
-
-                gender = int(request.POST.get('gender'))
-                cls = Department.objects.get(name=request.POST.get('cls'))
-                nickname = request.POST.get('nickname')
-                usertype = UserType.objects.get(caption=request.POST.get('user_type'))
-                phone = request.POST.get('phone')
-                motto = request.POST.get('motto')
-                edit_obj = Employee.objects.filter(emp_num=emp_num)
-                edit_obj.update(emp_num=emp_num, username=username, email=email, cid=cls, nickname=nickname,
-                                user_type=usertype, motto=motto,
-                                gender=gender, phone=phone,
-                                age=age
-                                )
-                member_list = Employee.objects.all()
-
-                return redirect('/memberManage/', {'member_list': member_list})
-            else:
-                edit_member_id = request.GET.get('edit_sno')
-                # 所有用户类型列表
-                emp_type_list = UserType.objects.all()
-                # 所有的部门
-                cls_list = Department.objects.all()
-                # 所有的专业
-                major_list = MajorInfo.objects.all()
-                # 当前编辑的用户对象
-                edit_emp_obj = Employee.objects.get(emp_num=edit_member_id)
-                return render(request, 'edit_member.html', locals())
-        else:
-            return render(request, 'member_manage_denied.html')
-    else:
-        return render(request, 'page-login.html', {'error_msg': ''})
-
-
-# 公告墙展示
-@is_login
-def notice(request):
-    info_list = Notice.objects.all().order_by('-post_date')
-    return render(request, 'notice.html', locals())
-
-
-# 公告墙发布
-@is_login
-def noticeManage(request):
-    (flag, user) = check_cookie(request)
-    if user.user_type.caption == 'admin':
-        if request.method == 'POST':
-            title = request.POST.get('title')
-            content = request.POST.get('content')
-            level = request.POST.get('selectLevel')
-            Notice.objects.create(head=title, content=content, level=level, author=user)
-            return render(request, 'notice_manage.html')
-        else:
-            return render(request, 'notice_manage.html')
-    else:
-        return render(request, 'notice_manage_denied.html')
-
-
-# 考核记录
-@is_login
-def exam(request):
-    exam_list=ExamContent.objects.all()
-    exam_id=request.GET.get('exam_id')
-    if exam_id:
-        user_list=Exam.objects.filter(content_id=exam_id).all()
-    return render(request, 'exam.html',locals())
-
-
-# 考核管理
-@is_login
-def exam_manage(request):
-    (flag, user) = check_cookie(request)
-    if user.user_type.caption == 'admin':
-        if request.method == 'POST':
-            title = request.POST.get('title')
-
-            if title:
-                ExamContent.objects.create(title=title)
-            else:
-                count = Employee.objects.all().count()
-                content_id = request.POST.get('exam_id')
-                for i in range(count):
-                    point=request.POST.get('point{}'.format(i))
-
-                    empID=request.POST.get('emp{}'.format(i))
-                    detail = request.POST.get('detail{}'.format(i))
-                    Exam.objects.create(point=point,content_id=content_id,user_id=empID,detail=detail)
-                # print(request.body)
-                ExamContent.objects.filter(id=content_id).update(state=True)
-        check_list = ExamContent.objects.filter(state=False)
-        user_list = Employee.objects.all()
-        return render(request, 'exam_manage.html', locals())
-    else:
-        return render(request, 'exam_manage_denied.html')
+# # 部门管理
+# def department_manage(request):
+#     (flag, rank) = check_cookie(request)
+#     print('departmentManage:flag', flag)
+#     if flag:
+#         if rank.user_type.caption == 'admin':
+#             class_list = Department.objects.all()
+#
+#             return render(request, 'department_manage.html', {'class_list': class_list})
+#         else:
+#             return render(request, 'department_manage_denied.html')
+#     else:
+#         return render(request, 'page-login.html', {'error_msg': ''})
+#
+#
+# # 编辑部门
+# @csrf_exempt
+# def edit_department(request):
+#     (flag, rank) = check_cookie(request)
+#     print('flag', flag)
+#     if flag:
+#         if rank.user_type.caption == 'admin':
+#             if request.method == 'POST':
+#                 pre_edit_id = request.POST.get('edit_id')
+#                 class_name = request.POST.get('edit_department_name')
+#                 temp_flag = Department.objects.filter(name=class_name)
+#                 print('pre_edit_id1', pre_edit_id)
+#                 pre_obj = Department.objects.get(id=pre_edit_id)
+#                 if not temp_flag and class_name:
+#                     pre_obj.name = class_name
+#                     pre_obj.save()
+#                 return HttpResponse('部门修改成功')
+#             class_list = Department.objects.all()
+#             return render(request, 'departmentManage.html', {'class_list': class_list})
+#             # return HttpResponse('编辑部门')
+#         else:
+#             return render(request, 'department_manage_denied.html')
+#     else:
+#         return render(request, 'page-login.html', {'error_msg': ''})
+#
+#
+# # 添加部门
+# @csrf_exempt
+# def add_department(request):
+#     # print('进来了')
+#     if request.method == 'POST':
+#         # print('这是post')
+#         add_department_name = request.POST.get('add_department_name')
+#         flag = Department.objects.filter(name=add_department_name)
+#         if flag:
+#             pass
+#             # print('已有数据，不处理')
+#         else:
+#             if add_department_name:
+#                 Department.objects.create(name=add_department_name).save()
+#
+#         return HttpResponse('添加部门成功')
+#
+#
+# # 删除部门
+# def delete_department(request):
+#     (flag, rank) = check_cookie(request)
+#     print('flag', flag)
+#     if flag:
+#         if rank.user_type.caption == 'admin':
+#             # class_list=Department.objects.all()
+#             delete_id = request.GET.get('delete_id')
+#             Department.objects.filter(id=delete_id).delete()
+#             return redirect('/departmentManage/')
+#         else:
+#             return render(request, 'department_manage_denied.html')
+#     else:
+#         return render(request, 'page-login.html', {'error_msg': ''})
+#
+#
+# # 成员管理
+# def member_manage(request):
+#     (flag, rank) = check_cookie(request)
+#     if flag:
+#         if rank.user_type.caption == 'admin':
+#             member_list = Employee.objects.all()
+#
+#             return render(request, 'member_manage.html', {'member_list': member_list})
+#         else:
+#             return render(request, 'member_manage_denied.html')
+#     else:
+#         return render(request, 'page-login.html', {'error_msg': ''})
+#
+#
+# # 删除成员
+# def delete_member(request):
+#     (flag, rank) = check_cookie(request)
+#     if flag:
+#         if rank.user_type.caption == 'admin':
+#             delete_sno = request.GET.get('delete_sno')
+#             Employee.objects.get(emp_num=delete_sno).delete()
+#             member_list = Employee.objects.all()
+#             return render(request, 'member_manage.html', {'member_list': member_list})
+#         else:
+#             return render(request, 'member_manage_denied.html')
+#     else:
+#         return render(request, 'page-login.html', {'error_msg': ''})
+#
+#
+# #   编辑成员
+# def edit_member(request):
+#     (flag, rank) = check_cookie(request)
+#     if flag:
+#         if rank.user_type.caption == 'admin':
+#
+#             if request.method == 'POST':
+#                 emp_num = request.POST.get('emp_num')
+#                 username = request.POST.get('username')
+#                 email = request.POST.get('email')
+#                 age = request.POST.get('age')
+#                 if age:
+#                     age = int(age)
+#                 else:
+#                     age = 0
+#
+#                 gender = int(request.POST.get('gender'))
+#                 cls = Department.objects.get(name=request.POST.get('cls'))
+#                 nickname = request.POST.get('nickname')
+#                 usertype = UserType.objects.get(caption=request.POST.get('user_type'))
+#                 phone = request.POST.get('phone')
+#                 motto = request.POST.get('motto')
+#                 edit_obj = Employee.objects.filter(emp_num=emp_num)
+#                 edit_obj.update(emp_num=emp_num, username=username, email=email, cid=cls, nickname=nickname,
+#                                 user_type=usertype, motto=motto,
+#                                 gender=gender, phone=phone,
+#                                 age=age
+#                                 )
+#                 member_list = Employee.objects.all()
+#
+#                 return redirect('/memberManage/', {'member_list': member_list})
+#             else:
+#                 edit_member_id = request.GET.get('edit_sno')
+#                 # 所有用户类型列表
+#                 emp_type_list = UserType.objects.all()
+#                 # 所有的部门
+#                 cls_list = Department.objects.all()
+#                 # 所有的专业
+#                 major_list = MajorInfo.objects.all()
+#                 # 当前编辑的用户对象
+#                 edit_emp_obj = Employee.objects.get(emp_num=edit_member_id)
+#                 return render(request, 'edit_member.html', locals())
+#         else:
+#             return render(request, 'member_manage_denied.html')
+#     else:
+#         return render(request, 'page-login.html', {'error_msg': ''})
+#
+#
+# # 公告墙展示
+# @is_login
+# def notice(request):
+#     info_list = Notice.objects.all().order_by('-post_date')
+#     return render(request, 'notice.html', locals())
+#
+#
+# # 公告墙发布
+# @is_login
+# def noticeManage(request):
+#     (flag, user) = check_cookie(request)
+#     if user.user_type.caption == 'admin':
+#         if request.method == 'POST':
+#             title = request.POST.get('title')
+#             content = request.POST.get('content')
+#             level = request.POST.get('selectLevel')
+#             Notice.objects.create(head=title, content=content, level=level, author=user)
+#             return render(request, 'notice_manage.html')
+#         else:
+#             return render(request, 'notice_manage.html')
+#     else:
+#         return render(request, 'notice_manage_denied.html')
+#
+#
+# # 考核记录
+# @is_login
+# def exam(request):
+#     exam_list=ExamContent.objects.all()
+#     exam_id=request.GET.get('exam_id')
+#     if exam_id:
+#         user_list=Exam.objects.filter(content_id=exam_id).all()
+#     return render(request, 'exam.html',locals())
+#
+#
+# # 考核管理
+# @is_login
+# def exam_manage(request):
+#     (flag, user) = check_cookie(request)
+#     if user.user_type.caption == 'admin':
+#         if request.method == 'POST':
+#             title = request.POST.get('title')
+#
+#             if title:
+#                 ExamContent.objects.create(title=title)
+#             else:
+#                 count = Employee.objects.all().count()
+#                 content_id = request.POST.get('exam_id')
+#                 for i in range(count):
+#                     point=request.POST.get('point{}'.format(i))
+#
+#                     empID=request.POST.get('emp{}'.format(i))
+#                     detail = request.POST.get('detail{}'.format(i))
+#                     Exam.objects.create(point=point,content_id=content_id,user_id=empID,detail=detail)
+#                 # print(request.body)
+#                 ExamContent.objects.filter(id=content_id).update(state=True)
+#         check_list = ExamContent.objects.filter(state=False)
+#         user_list = Employee.objects.all()
+#         return render(request, 'exam_manage.html', locals())
+#     else:
+#         return render(request, 'exam_manage_denied.html')
+#
+#
+# # 专业管理
+# def majorManage(request):
+#     (flag, rank) = check_cookie(request)
+#     if flag:
+#         if rank.user_type.caption == 'admin':
+#             major_list = MajorInfo.objects.all()
+#
+#             return render(request, 'major_manage.html', {'major_list': major_list})
+#         else:
+#             return render(request, 'major_manage_denied.html')
+#     else:
+#         return render(request, 'page-login.html', {'error_msg': ''})
+#
+#
+# # 添加专业
+# @csrf_exempt
+# def add_major(request):
+#     (flag, rank) = check_cookie(request)
+#     if flag:
+#         if rank.user_type.caption == 'admin':
+#             major_list = MajorInfo.objects.all()
+#             if request.method == 'POST':
+#
+#                 add_major_name = request.POST.get('add_major_name')
+#                 print(add_major_name)
+#                 if not MajorInfo.objects.filter(name=add_major_name):
+#                     new_major = MajorInfo.objects.create(name=add_major_name)
+#                 return HttpResponse('专业添加成功')
+#
+#             return render(request, 'major_manage.html', {'major_list': major_list})
+#         else:
+#             return render(request, 'major_manage_denied.html')
+#     else:
+#         return render(request, 'page-login.html', {'error_msg': ''})
+#
+#
+# # 删除专业
+# def delete_major(request):
+#     (flag, rank) = check_cookie(request)
+#     if flag:
+#         if rank.user_type.caption == 'admin':
+#
+#             delete_major_id = request.GET.get('delete_id')
+#             MajorInfo.objects.get(id=delete_major_id).delete()
+#             major_list = MajorInfo.objects.all()
+#             return render(request, 'major_manage.html', {'major_list': major_list})
+#         else:
+#             return render(request, 'major_manage_denied.html')
+#     else:
+#         return render(request, 'page-login.html', {'error_msg': ''})
+#
+#
+# # 编辑专业
+# @csrf_exempt
+# def edit_major(request):
+#     (flag, rank) = check_cookie(request)
+#     if flag:
+#         if rank.user_type.caption == 'admin':
+#             major_list = MajorInfo.objects.all()
+#             edit_major_id = request.POST.get('edit_major_id')
+#             edit_major_name = request.POST.get('edit_major_name')
+#             print(edit_major_id)
+#             print(edit_major_name)
+#             if not MajorInfo.objects.filter(name=edit_major_name):
+#                 change_obj = MajorInfo.objects.get(id=edit_major_id)
+#                 change_obj.name = edit_major_name
+#                 change_obj.save()
+#             return HttpResponse('专业修改成功')
+#
+#         else:
+#             return render(request, 'major_manage_denied.html')
+#     else:
+#         return render(request, 'page-login.html', {'error_msg': ''})

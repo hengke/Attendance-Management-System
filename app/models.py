@@ -5,7 +5,55 @@ from datetime import datetime
 from django.utils import timezone
 
 
-# Create your models here.
+# 工作时间制度
+class WorkTime(models.Model):
+    name = models.TextField(max_length=20, verbose_name='工作时间制度名称')  # 普通（上午、下午）、朝九晚五、倒班（早班、中班、晚班）
+    shift = models.TextField(max_length=20, verbose_name='班次')
+    start_time = models.TimeField(null=False, blank=True, verbose_name='开始时间')
+    end_time = models.TimeField(null=False, blank=True, verbose_name='结束时间')
+    remarks = models.TextField(default='', blank=True, max_length=100, verbose_name='备注')
+
+    def __str__(self):
+        return self.name
+
+
+# 节日名称
+class HolidayName(models.Model):
+    # HOLIDAY_NAME_CHOICES = (
+    #     ('上班','上班'),  # Workday
+    #     ('元旦', '元旦'),  # 1月1日
+    #     ('春节', '春节'),  # 农历正月初一、初二、初三
+    #     ('清明节', '清明节'),  # 农历清明当日
+    #     ('劳动节', '劳动节'),  # 5月1日
+    #     ('端午节', '端午节'),  # 农历端午当日
+    #     ('中秋节', '中秋节'),  # 农历中秋当日
+    #     ('国庆节', '国庆节'),  # 10月1日、2日、3日
+    #     ('妇女节', '妇女节'),  # 3月8日，妇女放假半天
+    #     ('青年节', '青年节'),  # 5月4日，14周岁以上的青年放假半天
+    # )
+    name = models.TextField(max_length=20, verbose_name='假期名称')
+    remarks = models.TextField(default='', blank=True, max_length=100, verbose_name='备注')
+
+    def __str__(self):
+        return self.name
+
+
+# 节日假期及调休表
+class HolidayArrangements(models.Model):
+    date = models.DateField(null=False, verbose_name='日期')
+    name = models.ForeignKey(to='HolidayName', on_delete=models.CASCADE, verbose_name='假期名称')
+    is_legal_holidays = models.BooleanField(default=False, verbose_name='是否法定节假日')
+
+
+# 休假类别
+class LeaveType(models.Model):
+    name = models.TextField(max_length=20, verbose_name='假别')
+    remarks = models.TextField(default='', blank=True, max_length=100, verbose_name='假期名称')
+
+    def __str__(self):
+        return self.name
+
+
 class UserType(models.Model):
     # 用户类型表  字段：用户类型
     caption = models.CharField(max_length=10, verbose_name='用户类型')
@@ -37,8 +85,7 @@ class Employee(models.Model):
         return self.user.username
 
     def get(self, username):
-        myuser = User.objects.get(username)
-        return myuser
+        return User.objects.get(username)
 
 
 # 部门信息表
@@ -50,32 +97,29 @@ class Department(models.Model):
         return self.name
 
 
-# 休假及调休表
-class Holidays(models.Model):
-    # year = models.IntegerField(null=False, verbose_name='年度')
-    date = models.DateField(null=False, verbose_name='日期')
-    holidays_name = models.CharField(max_length=20, verbose_name='假期名称')
-    is_legal_holidays = models.BooleanField(default=False, verbose_name='是否法定节假日')
-
-
 # 请假表
 class Leave(models.Model):
     # 请假表 字段：用户，假单编号，假别，请假时间，销假时间，开始时间，结束时间，请假原因，目的地，审批单编号
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    leave_id = models.TextField(max_length=255, verbose_name='假单编号')  # 例子：JDYT-YJY-LEAVE-2019070811151562555730
-    leave_type = models.TextField(max_length=100, verbose_name='假别')  # 假别
+    leave_type = models.ForeignKey(LeaveType, verbose_name='假别', on_delete=models.CASCADE)  # 假别
     ask_time = models.DateField(null=False, blank=True, verbose_name='请假时间')  # 请假时间
     report_back_time = models.DateField(null=True, blank=True, verbose_name='销假时间')  # 销假时间
     start_time = models.DateField(null=False, blank=True, verbose_name='开始时间')  # 开始时间
     end_time = models.DateField(null=False, blank=True, verbose_name='结束时间')  # 结束时间
     reason = models.TextField(default='无', max_length=500, verbose_name='请假原因')   # 请假原因
     destination = models.TextField(null=True, max_length=100, verbose_name='目的地')  # 目的地
-    approval_id = models.TextField(max_length=255, verbose_name='审批单编号')  # 例子：JDYT-YJY-Approval-2019070811151562555730
+
+    # 例子：2019070811151562555730，datetime.datetime.now().strftime('%Y%m%d%s%f')
+    leave_id = models.TextField(max_length=255, verbose_name='假单编号')
+    approval_id = models.TextField(max_length=255, verbose_name='审批单编号')
 
     def __str__(self):
         return self.leave_id
 
     def _get_leave_days(self):
+        if self.report_back_time and self.report_back_time < self.end_time:
+            return '%d' % ((self.report_back_time - self.start_time).days + 1)
+
         return '%d' % ((self.end_time - self.start_time).days + 1)
 
     class Meta:
@@ -94,7 +138,7 @@ class Attendance(models.Model):
     date = models.DateField(default=timezone.now)
     # state=models.BooleanField(default=False)
     is_leave = models.BooleanField(default=False)
-    detail = models.TextField(default='无', verbose_name='备注')
+    detail = models.TextField(default='', verbose_name='备注')
     leave_count = models.IntegerField(default=0, verbose_name='请假天数')
 
     def __str__(self):

@@ -128,10 +128,12 @@
     </div>
 
     <script>
-        $('.panel-body').on('click', '#sign_btn', function () {
+        // $('.panel-body').on('click', '#sign_btn', function () {
+        $('.jumbotron').on('click', '#sign_btn', function () {
             $.post('/check/', {'sign':"{{ sign_flag }}"}, function (ret) {
-                window.location.reload(true)
+                // window.location.reload(true)
                 alert('操作成功')
+                window.location.reload(true)
             })
 
         })
