@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block content %}
+    <link href="/static/css/bootstrap-datetimepicker-standalone.min.css" rel="stylesheet">
+    <link href="/static/css/bootstrap-select.min.css">
+    <script src="/static/js/bootstrap-select.min.js"></script>
+    <script src="/static/js/moment.min.js"></script>
+    <script src="/static/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="/static/js/moment-with-locales.min.js"></script>
+    <div class="jumbotron col-sm-8">
+        <div class="panel panel-primary">
+            <!--表单开始-->
+            <div class="panel-heading">
+                <h2 class="panel-title">员工信息</h2>
+            </div>
+            <div class="panel-body">
+                <table class="table table-striped">
+                    {% csrf_token %}
+                    <tbody>
+                        <tr>
+                            <td>用户名： </td><td>{{ emp.user.username }}</td>
+                        </tr>
+                        <tr>
+                            <td>员工编号： </td><td>{{ emp.emp_num }}</td>
+                        </tr>
+                        <tr>
+                            <td>姓名： </td><td>{{ emp.full_name }}</td>
+                        </tr>
+                        <tr>
+                            <td>部门： </td><td>{{ emp.department.name }}</td>
+                        </tr>
+                        <tr>
+                            <td>职务： </td><td>{{ emp.user_type.caption }}</td>
+                        </tr>
+                        <tr>
+                            <td>性别： </td><td>{{ emp.gender }}</td>
+                        </tr>
+                        <tr>
+                            <td>出生日期： </td><td>{{ emp.birth_date }}</td>
+                        </tr>
+                        <tr>
+                            <td>办公电话： </td><td>{{ emp.work_phone }}</td>
+                        </tr>
+                        <tr>
+                            <td>手机号码： </td><td>{{ emp.cell_phone }}</td>
+                        </tr>
+                        <tr>
+                            <td>Email: </td><td>{{ emp.user.email }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!--表单结束-->
+    </div>
+{% endblock content %}
+{% block sidebar %}
+    0
+{% endblock sidebar %}

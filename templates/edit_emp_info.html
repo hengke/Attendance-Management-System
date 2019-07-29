@@ -1,13 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
-    <div class="page-header">
-        <h1>编辑员工信息</h1>
-    </div>
+    <link href="/static/css/bootstrap-datetimepicker-standalone.min.css" rel="stylesheet">
+    <link href="/static/css/bootstrap-select.min.css">
+    <script src="/static/js/bootstrap-select.min.js"></script>
+    <script src="/static/js/moment.min.js"></script>
+    <script src="/static/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="/static/js/moment-with-locales.min.js"></script>
     <div class="jumbotron col-sm-8">
         <div class="panel panel-primary">
             <!--表单开始-->
             <div class="panel-heading">
-                <h3 class="panel-title">员工信息</h3>
+                <h2 class="panel-title">员工信息</h2>
             </div>
             <div class="panel-body">
                 <form id="defaultForm" role="form" class="form-signin form-horizontal" action="/edit_emp_info/" method="post">
@@ -32,21 +35,60 @@
                         </div>
                     </div>
                     <div class="form-group">
+                    <div class="form-group">
                         <label for="department" class="col-sm-4 control-label">部门：</label>
                         <div class="col-sm-4">
-                            <input class="form-control" type="text" name="department" id="department" value="{{ emp.department }}"/>
+                            <select class="form-control" id="selectDepartment" name="department">
+                                {% for dept in dept_list %}
+                                    {% ifequal dept.id emp.department.id %}
+                                        <option value="{{ dept.name }}" selected>{{ dept.name }}</option>
+                                    {% else %}
+                                        <option value="{{ dept.name }}">{{ dept.name }}</option>
+                                    {% endifequal %}
+
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="user_type" class="col-sm-4 control-label">职务：</label>
+                        <div class="col-sm-4">
+                            <select class="form-control" id="user_type" name="user_type">
+                                {% for user_type in user_type_list %}
+                                    {% ifequal user_type.id emp.user_type.id %}
+                                        <option value="{{ user_type.caption }}" selected>{{ user_type.caption }}</option>
+                                    {% else %}
+                                        <option value="{{ user_type.caption }}">{{ user_type.caption }}</option>
+                                    {% endifequal %}
+
+                                {% endfor %}
+                            </select>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="gender" class="col-sm-4 control-label">性别：</label>
-                        <div class="col-sm-4">
-                            <input class="form-control" type="text" name="gender" id="gender" value="{{ emp.gender }}"/>
+                        <div class="col-sm-8">
+                        <label class="radio-inline">
+                            <input type="radio" name="gender" id="gender" value="男"
+                                    {% ifequal emp.gender "男" %}
+                                        checked
+                                    {% endifequal %} > 男
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="gender" id="gender" value="女"
+                                    {% ifequal emp.gender "女" %}
+                                        checked
+                                    {% endifequal %} > 女
+                        </label>
                         </div>
+{#                        <div class="col-sm-4">#}
+{#                            <input class="form-control" type="text" name="gender" id="gender" value="{{ emp.gender }}"/>#}
+{#                        </div>#}
                     </div>
                     <div class="form-group">
                         <label for="birth_date" class="col-sm-4 control-label">出生日期：</label>
-                        <div class="col-sm-4">
-                            <input class="form-control" type="text" name="birth_date" id="birth_date" value="{{ emp.birth_date }}"/>
+                        <div class="col-sm-4 date">
+                            <input class="form-control" type="text" name="birth_date" id="birth_date"  value="{{ emp.birth_date }}" />
                         </div>
                     </div>
                     <div class="form-group">
@@ -78,7 +120,14 @@
         </div>
         <!--表单结束-->
     </div>
-
+    <script>
+        $(function () {
+            $('#birth_date').datetimepicker({
+                format: 'YYYY-MM-DD',
+                locale: moment.locale('zh-cn')
+            });
+        })
+    </script>
 {% endblock content %}
 {% block sidebar %}
     0

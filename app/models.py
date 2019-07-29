@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-# from datetime import datetime
+from datetime import datetime
 from django.utils import timezone
 
 
@@ -71,6 +71,17 @@ class Leave(models.Model):
     reason = models.TextField(default='无', max_length=500, verbose_name='请假原因')   # 请假原因
     destination = models.TextField(null=True, max_length=100, verbose_name='目的地')  # 目的地
     approval_id = models.TextField(max_length=255, verbose_name='审批单编号')  # 例子：JDYT-YJY-Approval-2019070811151562555730
+
+    def __str__(self):
+        return self.leave_id
+
+    def _get_leave_days(self):
+        return '%d' % ((self.end_time - self.start_time).days + 1)
+
+    class Meta:
+        ordering = ['ask_time']
+
+    leave_days = property(_get_leave_days)
 
 
 # 考勤记录表
