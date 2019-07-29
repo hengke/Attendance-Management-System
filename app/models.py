@@ -19,18 +19,6 @@ class WorkTime(models.Model):
 
 # 节日名称
 class HolidayName(models.Model):
-    # HOLIDAY_NAME_CHOICES = (
-    #     ('上班','上班'),  # Workday
-    #     ('元旦', '元旦'),  # 1月1日
-    #     ('春节', '春节'),  # 农历正月初一、初二、初三
-    #     ('清明节', '清明节'),  # 农历清明当日
-    #     ('劳动节', '劳动节'),  # 5月1日
-    #     ('端午节', '端午节'),  # 农历端午当日
-    #     ('中秋节', '中秋节'),  # 农历中秋当日
-    #     ('国庆节', '国庆节'),  # 10月1日、2日、3日
-    #     ('妇女节', '妇女节'),  # 3月8日，妇女放假半天
-    #     ('青年节', '青年节'),  # 5月4日，14周岁以上的青年放假半天
-    # )
     name = models.TextField(max_length=20, verbose_name='假期名称')
     remarks = models.TextField(default='', blank=True, max_length=100, verbose_name='备注')
 
