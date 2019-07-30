@@ -6,7 +6,14 @@
 {#        <div class="panel panel-primary">#}
         <div class="row">
             <div class="col-md-8">
-                <h2>您好！{{ emp.full_name }}（{{ user.username }}）</h2>
+                <h2>您好！
+                    {% ifequal emp.full_name None %}
+                        <p style="color: red">系统中没有您的姓名，请编辑您的员工信息！</p>
+                    {% else %}
+                        {{ emp.full_name }}
+{#                        （{{ user.username }}）#}
+                    {% endifequal %}
+                </h2>
                 <p>今天又是全新的一天，我想您今天已经有了自己的计划，加油！<img width="30" height="30" src="/static/img/quantou1.jpg"></p>
             </div>
             <div class="col-md-2">
@@ -20,23 +27,7 @@
                 </button>
             </div>
             <div class="col-md-2">
-{#                <object id="honehoneclock" width="160" height="70" align="middle"#}
-{#                        codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0"#}
-{#                        classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000">#}
-{#                    <param value="always" name="allowScriptAccess">#}
-{#                    <param value="http://chabudai.sakura.ne.jp/blogparts/honehoneclock/honehone_clock_tr.swf"#}
-{#                           name="movie">#}
-{#                    <param value="high" name="quality">#}
-{#                    <param value="#ffffff" name="bgcolor">#}
-{#                    <param value="transparent" name="wmode">#}
-{#                    <embed width="160" height="70" align="middle"#}
-{#                           pluginspage="http://www.macromedia.com/go/getflashplayer"#}
-{#                           type="application/x-shockwave-flash" allowscriptaccess="always" name="honehoneclock"#}
-{#                           bgcolor="#ffffff" quality="high"#}
-{#                           src="http://chabudai.sakura.ne.jp/blogparts/honehoneclock/honehone_clock_tr.swf"#}
-{#                           wmode="transparent">#}
-{#                </object>#}
-                <object id="honehoneclock" width="160" height="70" align="middle"
+                <object id="honehoneclock" width="200" height="100" align="middle"
                         codebase="/static/flash/swflash.cab#version=8,0,0,0"
                         classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000">
                     <param value="always" name="allowScriptAccess">
@@ -45,7 +36,7 @@
                     <param value="high" name="quality">
                     <param value="#ffffff" name="bgcolor">
                     <param value="transparent" name="wmode">
-                    <embed width="160" height="60" align="middle"
+                    <embed width="200" height="100" align="middle"
                         pluginspage="http://www.macromedia.com/go/getflashplayer"
                         type="application/x-shockwave-flash" allowscriptaccess="always" name="honehoneclock"
                         bgcolor="#ffffff" quality="high"
@@ -95,17 +86,17 @@
     </div>
     {#巨幕结束#}
     <!-- 两个动画 -->
-    <div class="row">
-        <div class="col-sm-4">
-            <object type="application/x-shockwave-flash" style="outline:none;"
-                    data="/static/flash/hamster.swf?up_bodyColor=f0e9cc&amp;up_feetColor=D4C898&amp;up_eyeColor=000567&amp;up_wheelSpokeColor=DEDEDE&amp;up_wheelColor=FFFFFF&amp;up_waterColor=E0EFFF&amp;up_earColor=b0c4de&amp;up_wheelOuterColor=FF4D4D&amp;up_snoutColor=F7F4E9&amp;up_bgColor=F0E4E4&amp;up_foodColor=cba920&amp;up_wheelCenterColor=E4EB2F&amp;up_tailColor=E6DEBE&amp;"
-                    width="200" height="160">
-                <param name="movie"
-                       value="/static/flash/hamster.swf?up_bodyColor=f0e9cc&amp;up_feetColor=D4C898&amp;up_eyeColor=000567&amp;up_wheelSpokeColor=DEDEDE&amp;up_wheelColor=FFFFFF&amp;up_waterColor=E0EFFF&amp;up_earColor=b0c4de&amp;up_wheelOuterColor=FF4D4D&amp;up_snoutColor=F7F4E9&amp;up_bgColor=F0E4E4&amp;up_foodColor=cba920&amp;up_wheelCenterColor=E4EB2E&amp;up_tailColor=E6DEBE&amp;">
-                <param name="AllowScriptAccess" value="always">
-                <param name="wmode" value="opaque">
-            </object>
-        </div>
+{#    <div class="row">#}
+{#        <div class="col-sm-4">#}
+{#            <object type="application/x-shockwave-flash" style="outline:none;"#}
+{#                    data="/static/flash/hamster.swf?up_bodyColor=f0e9cc&amp;up_feetColor=D4C898&amp;up_eyeColor=000567&amp;up_wheelSpokeColor=DEDEDE&amp;up_wheelColor=FFFFFF&amp;up_waterColor=E0EFFF&amp;up_earColor=b0c4de&amp;up_wheelOuterColor=FF4D4D&amp;up_snoutColor=F7F4E9&amp;up_bgColor=F0E4E4&amp;up_foodColor=cba920&amp;up_wheelCenterColor=E4EB2F&amp;up_tailColor=E6DEBE&amp;"#}
+{#                    width="200" height="160">#}
+{#                <param name="movie"#}
+{#                       value="/static/flash/hamster.swf?up_bodyColor=f0e9cc&amp;up_feetColor=D4C898&amp;up_eyeColor=000567&amp;up_wheelSpokeColor=DEDEDE&amp;up_wheelColor=FFFFFF&amp;up_waterColor=E0EFFF&amp;up_earColor=b0c4de&amp;up_wheelOuterColor=FF4D4D&amp;up_snoutColor=F7F4E9&amp;up_bgColor=F0E4E4&amp;up_foodColor=cba920&amp;up_wheelCenterColor=E4EB2E&amp;up_tailColor=E6DEBE&amp;">#}
+{#                <param name="AllowScriptAccess" value="always">#}
+{#                <param name="wmode" value="opaque">#}
+{#            </object>#}
+{#        </div>#}
 {#        <div class="col-sm-4">#}
 {#            <object type="application/x-shockwave-flash" style="outline:none;" data="http://cdn.abowman.com/widgets/fish/fish.swf?" width="300" height="200">#}
 {#                <param name="movie" value="http://cdn.abowman.com/widgets/fish/fish.swf?">#}
@@ -115,17 +106,17 @@
 {#                <param name="salign" value="tl"/>#}
 {#            </object>#}
 {#        </div>#}
-        <div class="col-sm-3 col-md-offset-5">
-            <object type="application/x-shockwave-flash" style="outline:none;"
-                    data="/static/flash/hamster.swf?up_bodyColor=000000&amp;up_feetColor=D4B898&amp;up_eyeColor=FFFFFF&amp;up_wheelSpokeColor=000000&amp;up_wheelColor=FFFFFF&amp;up_waterColor=66CDAA&amp;up_earColor=FFFFFF&amp;up_wheelOuterColor=000000&amp;up_snoutColor=FFFFFF&amp;up_bgColor=F5DEB3&amp;up_foodColor=000000&amp;up_wheelCenterColor=000000&amp;up_tailColor=FFFFFF&amp;"
-                    width="200" height="160">
-                <param name="movie"
-                       value="/static/flash/hamster.swf?up_bodyColor=f0e9cc&amp;up_feetColor=D4C898&amp;up_eyeColor=000567&amp;up_wheelSpokeColor=DEDEDE&amp;up_wheelColor=FFFFFF&amp;up_waterColor=E0EFFF&amp;up_earColor=b0c4de&amp;up_wheelOuterColor=FF4D4D&amp;up_snoutColor=F7F4E9&amp;up_bgColor=F0E4E4&amp;up_foodColor=cba920&amp;up_wheelCenterColor=E4EB2E&amp;up_tailColor=E6DEBE&amp;">
-                <param name="AllowScriptAccess" value="always">
-                <param name="wmode" value="opaque">
-            </object>
-        </div>
-    </div>
+{#        <div class="col-sm-3 col-md-offset-5">#}
+{#            <object type="application/x-shockwave-flash" style="outline:none;"#}
+{#                    data="/static/flash/hamster.swf?up_bodyColor=000000&amp;up_feetColor=D4B898&amp;up_eyeColor=FFFFFF&amp;up_wheelSpokeColor=000000&amp;up_wheelColor=FFFFFF&amp;up_waterColor=66CDAA&amp;up_earColor=FFFFFF&amp;up_wheelOuterColor=000000&amp;up_snoutColor=FFFFFF&amp;up_bgColor=F5DEB3&amp;up_foodColor=000000&amp;up_wheelCenterColor=000000&amp;up_tailColor=FFFFFF&amp;"#}
+{#                    width="200" height="160">#}
+{#                <param name="movie"#}
+{#                       value="/static/flash/hamster.swf?up_bodyColor=f0e9cc&amp;up_feetColor=D4C898&amp;up_eyeColor=000567&amp;up_wheelSpokeColor=DEDEDE&amp;up_wheelColor=FFFFFF&amp;up_waterColor=E0EFFF&amp;up_earColor=b0c4de&amp;up_wheelOuterColor=FF4D4D&amp;up_snoutColor=F7F4E9&amp;up_bgColor=F0E4E4&amp;up_foodColor=cba920&amp;up_wheelCenterColor=E4EB2E&amp;up_tailColor=E6DEBE&amp;">#}
+{#                <param name="AllowScriptAccess" value="always">#}
+{#                <param name="wmode" value="opaque">#}
+{#            </object>#}
+{#        </div>#}
+{#    </div>#}
 
     <script>
         // $('.panel-body').on('click', '#sign_btn', function () {

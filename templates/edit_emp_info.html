@@ -6,6 +6,10 @@
     <script src="/static/js/moment.min.js"></script>
     <script src="/static/js/bootstrap-datetimepicker.min.js"></script>
     <script src="/static/js/moment-with-locales.min.js"></script>
+
+    <link href="/static/css/bootstrapValidator.min.css" rel="stylesheet">
+    <script src="/static/js/bootstrapValidator.min.js"></script>
+
     <div class="jumbotron col-sm-8">
         <div class="panel panel-primary">
             <!--表单开始-->
@@ -25,13 +29,23 @@
                     <div class="form-group">
                         <label for="emp_num" class="col-sm-4 control-label">员工编号：</label>
                         <div class="col-sm-4">
-                            <input class="form-control" type="text" name="emp_num" id="emp_num" value="{{ emp.emp_num }}"/>
+                            <input class="form-control" type="text" name="emp_num" id="emp_num"
+                            {% ifequal emp.emp_num None %}
+                                value=""
+                            {% else %}
+                                value="{{ emp.emp_num }}" readonly="readonly" unselectable="on"
+                            {% endifequal %}/>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="full_name" class="col-sm-4 control-label">姓名：</label>
                         <div class="col-sm-4">
-                            <input class="form-control" type="text" name="full_name" id="full_name" value="{{ emp.full_name }}"/>
+                            <input class="form-control" type="text" name="full_name" id="full_name"
+                            {% ifequal emp.full_name None %}
+                                value=""
+                            {% else %}
+                                value="{{ emp.full_name }}"
+                            {% endifequal %}/>
                         </div>
                     </div>
                     <div class="form-group">
@@ -39,6 +53,7 @@
                         <label for="department" class="col-sm-4 control-label">部门：</label>
                         <div class="col-sm-4">
                             <select class="form-control" id="selectDepartment" name="department">
+                                <option value="" selected></option>
                                 {% for dept in dept_list %}
                                     {% ifequal dept.id emp.department.id %}
                                         <option value="{{ dept.name }}" selected>{{ dept.name }}</option>
@@ -54,6 +69,7 @@
                         <label for="user_type" class="col-sm-4 control-label">职务：</label>
                         <div class="col-sm-4">
                             <select class="form-control" id="user_type" name="user_type">
+                                <option value="" selected></option>
                                 {% for user_type in user_type_list %}
                                     {% ifequal user_type.id emp.user_type.id %}
                                         <option value="{{ user_type.caption }}" selected>{{ user_type.caption }}</option>
@@ -123,6 +139,8 @@
             });
         })
     </script>
+    <script src="/static/js/edit-emp-info.js"></script>
+
 {% endblock content %}
 {% block sidebar %}
     0

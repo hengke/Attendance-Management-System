@@ -16,6 +16,12 @@ class WorkTime(models.Model):
     def __str__(self):
         return self.name
 
+    def is_worktime(self, time):
+        if time >= self.start_time and time <= self.end_time:
+            return True
+        else:
+            return False
+
 
 # 节日名称
 class HolidayName(models.Model):
@@ -31,6 +37,15 @@ class HolidayArrangements(models.Model):
     date = models.DateField(null=False, verbose_name='日期')
     name = models.ForeignKey(to='HolidayName', on_delete=models.CASCADE, verbose_name='假期名称')
     is_legal_holiday = models.BooleanField(default=False, verbose_name='是否法定节假日')
+
+    def __str__(self):
+        str1 = self.name.name + ':' + self.date.strftime('%Y-%m-%d')
+        if self.is_legal_holiday:
+            str1 = str1 + ':法定节假日'
+        return str1
+
+    class Meta:
+        ordering = ['date']
 
 
 # 休假类别
@@ -127,6 +142,7 @@ class Attendance(models.Model):
     is_legal_holiday = models.BooleanField(default=False, verbose_name='是否法定节假日加班')
     is_leave = models.BooleanField(default=False, verbose_name='是否休假')
     remarks = models.TextField(default='', verbose_name='备注')
+    # 出勤
     # 加班：夜班，加班，节日加班
     # 请假：
     # 迟到

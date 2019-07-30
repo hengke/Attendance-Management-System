@@ -17,7 +17,7 @@ class HolidayNameAdmin(admin.ModelAdmin):
 
 
 class HolidayArrangementsAdmin(admin.ModelAdmin):
-    list_display = ['id', 'date', 'name', 'is_legal_holidays']
+    list_display = ['id', 'date', 'name', 'is_legal_holiday']
 
 
 class LeaveTypeAdmin(admin.ModelAdmin):

@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'^login/', views.login, name='login'),
     url(r'^register/', views.register, name='register'),
     url(r'^register_verify/', views.register_verify),
+    # url(r'^register_success/', views.register_success),
     url(r'^edit_emp_info/', views.edit_emp_info),
     url(r'^index/', views.index),
     url(r'^logout/', views.logout),
