@@ -68,7 +68,9 @@ def login(request):
 
 def check(request):
     (flag, rank) = check_cookie(request)
-    # get cur_day cur_time
+    user = rank
+    # cur_day = datetime.date.today()
+    # cur_time = datetime.datetime.now().time()
     # if cur_day is workday:
     #     is_workday = True
     # else:
@@ -106,7 +108,7 @@ def check(request):
         # else:
         #     签到，并创建加班记录，填写加班内容，备注普通加班
         try:
-            emp = Employee.objects.get(user=rank)
+            emp = Employee.objects.get(user=user)
         except Employee.DoesNotExist:
             emp = None
             return render(request, 'edit_emp_info.html', locals())
@@ -141,7 +143,7 @@ def check(request):
                     sign_flag = True
             else:
                 sign_flag = True
-            att_list = Signingin.objects.all().order_by('-id')
+            att_list = Signingin.objects.filter(employee=emp).order_by('-id')
             return render(request, 'check.html', locals())
     else:
         return render(request, 'page-login.html', {'error_msg': ''})
@@ -284,20 +286,25 @@ def register(request):
 # 注册验证
 def register_verify(request):
     if request.method == 'POST':
-        print('验证成功')
+        print('register_verify:验证成功')
         username = request.POST.get('username')
         email = request.POST.get('email')
         pwd = request.POST.get('password')
+        emp_num = request.POST.get('emp_num')
+        cell_phone = request.POST.get('cell_phone')
+
         user = User.objects.create_user(username, email, pwd)
         # user.is_superuser = False
-
         user.save()
 
-        emp_num = request.POST.get('emp_num')
-        emp = Employee.objects.create(user=user, emp_num=emp_num, user_type_id=2)
-
+        emp = Employee.objects.create(user=user, emp_num=emp_num, user_type_id=2, cell_phone=cell_phone)
         emp.save()
         return HttpResponse('OK')
+
+
+# 注册成功
+# def register_success(request):
+#     return render(request, 'register_success.html')
 
 
 # 签到统计

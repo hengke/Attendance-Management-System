@@ -13,7 +13,6 @@ $(function () {/* 文档加载，执行一个函数*/
                 /*验证：规则*/
                 username: {//验证input项：验证规则
                     message: 'The username is not valid',
-
                     validators: {
                         notEmpty: {//非空验证：提示消息
                             message: '用户名不能为空'
@@ -43,6 +42,40 @@ $(function () {/* 文档加载，执行一个函数*/
                         regexp: {
                             regexp: /^.+$/,
                             message: ''
+                        }
+                    }
+                },
+                emp_num: {
+                    message: 'The "employee" number is not valid',
+                    validators: {
+                        notEmpty: {
+                            message: '员工编号不能为空'
+                        },
+                        stringLength: {
+                            min: 8,
+                            max: 8,
+                            message: '请输入8位员工编号（不足8位首位用0填充）'
+                        },
+                        threshold: 1, //有1字符以上才发送ajax请求，（input中输入一个字符，插件会向服务器发送一次，设置限制，1字符以上才开始）
+                        remote: {//ajax验证。server result:{"valid",true or false} 向服务发送当前input name值，获得一个json数据。例表示正确：{"valid",true}
+                            url: '/register/',//验证地址
+                            message: '员工编号已存在',//提示消息
+                            delay: 2000,//每输入一个字符，就发ajax请求，服务器压力还是太大，设置2秒发送一次ajax（默认输入一个字符，提交一次，服务器压力太大）
+                            type: 'POST',//请求方式
+                            /**自定义提交数据，默认值提交当前input value*/
+                            data: function(t) {
+
+                               return {
+                                   emp_num_verify: $('[emp_num="emp_num"]').val()
+                                   // whatever: $('[name="whateverNameAttributeInYourForm"]').val()
+                               };
+                            }
+
+                        },
+                        regexp: {
+                            // regexp: /^(x?[0-9]){10}|([0-9]{11})$/,
+                            regexp: /^([0-9]{8})$/,
+                            message: '请输入正确的员工编号'
                         }
                     }
                 },
@@ -106,7 +139,7 @@ $(function () {/* 文档加载，执行一个函数*/
                         }
                     }
                 },
-                phone: {
+                cell_phone: {
                     message: 'The phone is not valid',
                     validators: {
                         notEmpty: {
@@ -120,23 +153,6 @@ $(function () {/* 文档加载，执行一个函数*/
                         regexp: {
                             regexp: /^1[3|5|8|9|6|7]{1}[0-9]{9}$/,
                             message: '请输入正确的手机号码'
-                        }
-                    }
-                },
-                emp_num: {
-                    message: 'The "employee" number is not valid',
-                    validators: {
-                        notEmpty: {
-                            message: '员工编号不能为空'
-                        },
-                        stringLength: {
-                            min: 11,
-                            max: 11,
-                            message: '请输入8位员工编号（不足11位首位用0填充）'
-                        },
-                        regexp: {
-                            regexp: /^(0?[0-9]){10}|([0-9]{11})$/,
-                            message: '请输入正确的员工编号'
                         }
                     }
                 },
@@ -175,6 +191,7 @@ $(function () {/* 文档加载，执行一个函数*/
             $.post('/register_verify/', $form.serialize(), function (result) {
 //do something...
                 if(result == 'OK'){
+                    alert("注册成功，请登录！")
                     window.location.href='/login/'
                 }
             });
