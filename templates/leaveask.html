@@ -1,12 +1,15 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <link href="/static/css/bootstrap-datetimepicker-standalone.min.css" rel="stylesheet">
+    <link href="/static/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen">
     <link href="/static/css/bootstrap-select.min.css">
+
     <script src="/static/js/bootstrap-select.min.js"></script>
-    <script src="/static/js/moment.min.js"></script>
-    <script src="/static/js/bootstrap-datetimepicker.min.js"></script>
+{#    <script src="/static/js/moment.min.js"></script>#}
     <script src="/static/js/moment-with-locales.min.js"></script>
+    <script src="/static/js/bootstrap-datetimepicker.js"></script>
+
+    <script type="text/javascript" src="/static/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
 
     <div class="jumbotron">
         <div class="panel panel-primary">
@@ -15,10 +18,11 @@
             </div>
             <div class="panel-body">
                 <form id="defaultForm" role="form" class="form-signin form-horizontal" action="/LeaveAsk/" method="post">
+                <fieldset>
                     {% csrf_token %}
                     <div class="form-group">
                         <label for="leaveType" class="col-sm-4 control-label">假别：</label>
-                        <div class='col-sm-8'>
+                        <div class='col-sm-4'>
                             <select class="form-control" id="leaveType" name="leaveType">
                                 {% for leave_type in leave_type_list %}
                                         <option value="{{ leave_type.name }}">{{ leave_type.name }}</option>
@@ -27,9 +31,34 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="datetimepicker1" class="col-sm-4 control-label">开始日期：</label>
+                        <label for="datetimepicker1" class="col-sm-4 control-label">开始时间：</label>
                         <div class="col-sm-4 date">
                             <input class="form-control" type="text" name="starttime" id="datetimepicker1" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dtp_input1" class="col-sm-4 control-label">开始日期：</label>
+                        <div class="input-group date form_datetime col-sm-4" data-date="" data-link-field="dtp_input1">
+                            <input class="form-control" size="16" type="text" value="" readonly>
+{#                            <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>#}
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="dtp_input2" class="col-sm-4 control-label">Date Picking</label>
+                        <div class="input-group date form_date col-sm-4" data-date="" data-link-field="dtp_input2" data-link-format="yyyy-mm-dd">
+                            <input class="form-control" size="16" type="text" value="" readonly>
+        {#                    <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>#}
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="dtp_input3" class="col-sm-4 control-label">Time Picking</label>
+                        <div class="input-group date form_time col-sm-4" data-date="" data-link-field="dtp_input3" data-link-format="hh:ii">
+                            <input class="form-control" size="16" type="text" value="" readonly>
+        {#                    <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>#}
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-time"></span></span>
                         </div>
                     </div>
                     <div class="form-group">
@@ -56,6 +85,7 @@
                                     >提交申请</button>
                         </div>
                     </div>
+                </fieldset>
                 </form>
             </div>
         </div>
@@ -82,6 +112,42 @@
                     return false;
                 };
             })
+        });
+    </script>
+    <script type="text/javascript">
+        $('.form_datetime').datetimepicker({
+            language:  'zh-CN',
+            format: 'yyyy-mm-dd hh:ii',
+            weekStart: 1,
+            todayBtn:  1,
+            autoclose: 1,
+            todayHighlight: 1,
+            startView: 2,
+            forceParse: 0,
+            showMeridian: 1
+        });
+        $('.form_date').datetimepicker({
+            language:  'zh-CN',
+            format: 'yyyy-mm-dd',
+            weekStart: 1,
+            todayBtn:  1,
+            autoclose: 1,
+            todayHighlight: 1,
+            startView: 2,
+            minView: 2,
+            forceParse: 0
+        });
+        $('.form_time').datetimepicker({
+            language:  'zh-CN',
+            format: 'hh:ii',
+            weekStart: 1,
+            todayBtn:  1,
+            autoclose: 1,
+            todayHighlight: 1,
+            startView: 1,
+            minView: 0,
+            maxView: 1,
+            forceParse: 0
         });
     </script>
 {% endblock content %}

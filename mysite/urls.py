@@ -31,7 +31,7 @@ urlpatterns = [
     url(r'^check/', views.check),
     url(r'^total', views.total),
     url(r'^LeaveAsk/', views.leave_ask),
-    url(r'^LeaveReportBack/', views.leave_report_back),
+    # url(r'^leave_report_back_success/', views.leave_report_back_success),
     url(r'^LeaveQuery/', views.leave_query),
 
     # url(r'^department_manage/', views.department_manage),
