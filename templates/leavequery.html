@@ -12,8 +12,8 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>假单编号</th>
-                        <th>员工编号</th>
+{#                        <th>假单编号</th>#}
+{#                        <th>员工编号</th>#}
                         <th>姓名</th>
                         <th>申请时间</th>
                         <th>假别</th>
@@ -27,13 +27,13 @@
                 <tbody>
                     {% for att in leave_list %}
                         <tr>
-                            <td>{{ att.leave_id }}</td>
-                            <td>{{ att.employee.emp_num }}</td>
+{#                            <td>{{ att.leave_id }}</td>#}
+{#                            <td>{{ att.employee.emp_num }}</td>#}
                             <td>{{ att.employee.full_name }}</td>
-                            <td>{{ att.ask_time | date:"Y-m-d" }}</td>
+                            <td>{{ att.ask_time | date:"Y-m-d H:i" }}</td>
                             <td>{{ att.leave_type }}</td>
-                            <td>{{ att.start_time | date:"Y-m-d" }}</td>
-                            <td>{{ att.end_time | date:"Y-m-d" }}</td>
+                            <td>{{ att.start_time | date:"Y-m-d H:i" }}</td>
+                            <td>{{ att.end_time | date:"Y-m-d H:i" }}</td>
                             <td>{{ att.leave_days }}</td>
                             {% if att.report_back_time is None %}
                                 <td>
@@ -46,7 +46,7 @@
                                     </form>
                                 </td>
                             {% else %}
-                                <td>{{ att.report_back_time | date:"Y-m-d" }}</td>
+                                <td>{{ att.report_back_time | date:"Y-m-d H:i" }}</td>
                             {% endif %}
                             <td>{{ att.reason }}</td>
                         </tr>

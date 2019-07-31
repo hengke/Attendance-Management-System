@@ -105,10 +105,10 @@ class Leave(models.Model):
     # 请假表 字段：用户，假单编号，假别，请假时间，销假时间，开始时间，结束时间，请假原因，目的地，审批单编号
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     leave_type = models.ForeignKey(LeaveType, verbose_name='假别', on_delete=models.CASCADE)  # 假别
-    ask_time = models.DateField(null=False, blank=True, verbose_name='请假时间')  # 请假时间
-    report_back_time = models.DateField(null=True, blank=True, verbose_name='销假时间')  # 销假时间
-    start_time = models.DateField(null=False, blank=True, verbose_name='开始时间')  # 开始时间
-    end_time = models.DateField(null=False, blank=True, verbose_name='结束时间')  # 结束时间
+    ask_time = models.DateTimeField(null=False, blank=True, verbose_name='请假时间')  # 请假时间
+    report_back_time = models.DateTimeField(null=True, blank=True, verbose_name='销假时间')  # 销假时间
+    start_time = models.DateTimeField(null=False, blank=True, verbose_name='开始时间')  # 开始时间
+    end_time = models.DateTimeField(null=False, blank=True, verbose_name='结束时间')  # 结束时间
     reason = models.TextField(default='无', max_length=500, verbose_name='请假原因')   # 请假原因
     destination = models.TextField(null=True, max_length=100, verbose_name='目的地')  # 目的地
 

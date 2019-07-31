@@ -1,14 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <link href="/static/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen">
-    <link href="/static/css/bootstrap-select.min.css">
-
-    <script src="/static/js/bootstrap-select.min.js"></script>
-{#    <script src="/static/js/moment.min.js"></script>#}
-    <script src="/static/js/moment-with-locales.min.js"></script>
-    <script src="/static/js/bootstrap-datetimepicker.js"></script>
-
+    <link rel="stylesheet" href="/static/css/bootstrap-datetimepicker.min.css" media="screen">
+{#    <link rel="stylesheet" href="/static/css/city-style.css">#}
+    <script type="text/javascript" src="/static/js/bootstrap-datetimepicker.js"></script>
     <script type="text/javascript" src="/static/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
 
     <div class="jumbotron">
@@ -18,11 +13,11 @@
             </div>
             <div class="panel-body">
                 <form id="defaultForm" role="form" class="form-signin form-horizontal" action="/LeaveAsk/" method="post">
-                <fieldset>
+                    <fieldset>
                     {% csrf_token %}
                     <div class="form-group">
-                        <label for="leaveType" class="col-sm-4 control-label">假别：</label>
-                        <div class='col-sm-4'>
+                        <label for="leaveType" class="col-sm-3 control-label">假别：</label>
+                        <div class='col-sm-3'>
                             <select class="form-control" id="leaveType" name="leaveType">
                                 {% for leave_type in leave_type_list %}
                                         <option value="{{ leave_type.name }}">{{ leave_type.name }}</option>
@@ -30,90 +25,101 @@
                             </select>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="datetimepicker1" class="col-sm-4 control-label">开始时间：</label>
-                        <div class="col-sm-4 date">
-                            <input class="form-control" type="text" name="starttime" id="datetimepicker1" />
-                        </div>
-                    </div>
+{#                    <div class="form-group">#}
+{#                        <label for="datetimepicker1" class="col-sm-3 control-label">开始时间：</label>#}
+{#                        <div class="col-sm-3 date">#}
+{#                            <input class="form-control" type="text" name="starttime" id="datetimepicker1" />#}
+{#                        </div>#}
+{#                    </div>#}
 
-                    <div class="form-group">
-                        <label for="dtp_input1" class="col-sm-4 control-label">开始日期：</label>
-                        <div class="input-group date form_datetime col-sm-4" data-date="" data-link-field="dtp_input1">
-                            <input class="form-control" size="16" type="text" value="" readonly>
+{#                    <div class="form-group">#}
+{#                        <label for="dtp_input1" class="col-sm-3 control-label">开始日期与时间：</label>#}
+{#                        <div class="input-group date form_datetime col-sm-3" data-date="" data-link-field="dtp_input1">#}
+{#                            <input class="form-control" size="16" type="text" value="" readonly>#}
 {#                            <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>#}
-                            <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-                        </div>
-                    </div>
+{#                            <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>#}
+{#                        </div>#}
+{#                    </div>#}
                     <div class="form-group">
-                        <label for="dtp_input2" class="col-sm-4 control-label">Date Picking</label>
-                        <div class="input-group date form_date col-sm-4" data-date="" data-link-field="dtp_input2" data-link-format="yyyy-mm-dd">
-                            <input class="form-control" size="16" type="text" value="" readonly>
+                        <label for="dtp_input1" class="col-sm-3 control-label">开始日期：</label>
+                        <div class="input-group date form_date col-sm-3" data-link-field="dtp_input3" data-link-format="yyyy-mm-dd">
+                            <input class="form-control" size="16" type="text"  name="startdate" value="" readonly>
         {#                    <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>#}
                             <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="dtp_input3" class="col-sm-4 control-label">Time Picking</label>
-                        <div class="input-group date form_time col-sm-4" data-date="" data-link-field="dtp_input3" data-link-format="hh:ii">
-                            <input class="form-control" size="16" type="text" value="" readonly>
-        {#                    <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>#}
+                        <label for="dtp_input2" class="col-sm-3 control-label">开始时间：</label>
+                        <div class="input-group date form_time col-sm-3" data-link-field="dtp_input3" data-link-format="hh:ii">
+                            <input class="form-control" size="16" type="text" name="starttime" value="" readonly>
                             <span class="input-group-addon"><span class="glyphicon glyphicon-time"></span></span>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="datetimepicker2" class="col-sm-4 control-label">结束时间：</label>
-                        <div class="col-sm-4 date">
-                            <input class="form-control" type="text" name="endtime" id="datetimepicker2" />
+                        <label for="dtp_input3" class="col-sm-3 control-label">结束日期：</label>
+                        <div class="input-group date form_date col-sm-3" data-link-field="dtp_input3" data-link-format="yyyy-mm-dd">
+                            <input class="form-control" size="16" type="text" name="enddate" value="" readonly>
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="destination" class="col-sm-4 control-label">目的地：</label>
-                        <div class="col-sm-4 date">
-                            <input class="form-control" type="text" name="destination" id="destination" />
+                        <label for="dtp_input4" class="col-sm-3 control-label">结束时间：</label>
+                        <div class="input-group date form_time col-sm-3" data-link-field="dtp_input4" data-link-format="hh:ii">
+                            <input class="form-control" size="16" type="text" name="endtime" value="" readonly>
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-time"></span></span>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="inputContent" class="col-sm-4 control-label">请假原因：</label>
-                        <div class="col-sm-4">
-                            <textarea rows="4" name="reason" class="form-control" id="inputContent"></textarea>
+                        <label for="destination" class="col-sm-3 control-label">目的地：</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" size="16" type="text" value="" name="destination" id="destination" readonly>
                         </div>
                     </div>
                     <div class="form-group">
-                        <div class="col-sm-offset-4 col-sm-4">
-                            <button type="submit" class="btn btn-success" id="sign_btn" style="height:50px;width:140px;cursor:pointer;font-size:20px;display:inline-block;"
-                                    >提交申请</button>
+                        <div class="col-sm-6 col-sm-offset-2">
+                            <!--省份选择-->
+                            <select id="prov" onchange="showCity(this)">
+                                <option>=请选择省份=</option>
+                            </select>
+                            <!--城市选择-->
+                            <select id="city" onchange="showCountry(this)">
+                                <option>=请选择城市=</option>
+                            </select>
+                            <!--县区选择-->
+                            <select id="country" onchange="selecCountry(this)">
+                                <option>=请选择县区=</option>
+                            </select>
+                            <button type="button" class="btn met1" id="city_btn" onClick="showAddr()">确定</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputContent" class="col-sm-3 control-label">请假原因：</label>
+                        <div class="col-sm-3">
+                            <textarea rows="3" name="reason" class="form-control" id="inputContent"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-4 col-sm-3">
+                            <button type="submit" class="btn btn-success" id="sign_btn" style="height:50px;width:140px;cursor:pointer;font-size:20px;display:inline-block;">提交申请</button>
                         </div>
                     </div>
                 </fieldset>
                 </form>
             </div>
         </div>
-{#    </div>#}
-    <script>
-        $(function () {
-            $('#datetimepicker1').datetimepicker({
-                format: 'YYYY-MM-DD',
-                locale: moment.locale('zh-cn')
-            });
-            $('#datetimepicker2').datetimepicker({
-                format: 'YYYY-MM-DD',
-                locale: moment.locale('zh-cn')
-            });
-        })
-    </script>
-    <script>
-        $('.panel-body').on('submit', '#sign_btn', function () {
-            $.post('/LeaveAsk/', {'sign':"{{ sign_flag }}"}, function (ret) {
-                var gnl=confirm("确定要提交?");
-                if (gnl==true){
-                    return true;
-                }else{
-                    return false;
-                };
-            })
-        });
-    </script>
+
+{#    <script>#}
+{#        $('.panel-body').on('submit', '#sign_btn', function () {#}
+{#            $.post('/LeaveAsk/', {'sign':"{{ sign_flag }}"}, function (ret) {#}
+{#                var gnl=confirm("确定要提交?");#}
+{#                if (gnl==true){#}
+{#                    return true;#}
+{#                }else{#}
+{#                    return false;#}
+{#                };#}
+{#            })#}
+{#        });#}
+{#    </script>#}
     <script type="text/javascript">
         $('.form_datetime').datetimepicker({
             language:  'zh-CN',
@@ -150,6 +156,10 @@
             forceParse: 0
         });
     </script>
+
+{#    只有将两个city js文件放在最后bootstrap-datetimepicker.js才能用，为什么呢？？？？？？#}
+    <script type="text/javascript" src="/static/js/city-data.js"></script>
+    <script type="text/javascript" src="/static/js/city-method.js"></script>
 {% endblock content %}
 {% block sidebar %}
     6

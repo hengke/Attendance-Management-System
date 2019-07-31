@@ -207,17 +207,37 @@ def leave_ask(request):
     if request.method == 'POST':
         leavetype = request.POST.get('leaveType')
         leave_type = LeaveType.objects.get(name=leavetype)
+        startdate = request.POST.get('startdate')
         starttime = request.POST.get('starttime')
         endtime = request.POST.get('endtime')
+        enddate = request.POST.get('enddate')
         destination = request.POST.get('destination')
         reason = request.POST.get('reason')
+        if startdate == '':
+            startdate = datetime.datetime.now().strftime('%Y-%m-%d')
 
+        if enddate == '':
+            enddate = startdate
+
+        if starttime == '':
+            starttime = '00:00:00'
+        else:
+            starttime = starttime + ':00'
+
+        if endtime == '':
+            endtime = '00:00:00'
+        else:
+            endtime = endtime + ':00'
+        str11 = startdate + ' ' + starttime
+        str22 = enddate + ' ' + endtime
+        startdatetime = datetime.datetime.strptime(str11, '%Y-%m-%d %H:%M:%S')
+        enddatetime = datetime.datetime.strptime(str22, '%Y-%m-%d %H:%M:%S')
         ask_time = datetime.datetime.now()
         leave_id = datetime.datetime.now().strftime('%Y%m%d%s%f')
         approval_id = datetime.datetime.now().strftime('%Y%m%d%s%f')
 
-        Leave.objects.create(employee=emp, leave_id=leave_id, leave_type=leave_type, ask_time=ask_time, start_time=starttime,
-                             end_time=endtime, reason=reason, destination=destination, approval_id=approval_id)
+        Leave.objects.create(employee=emp, leave_id=leave_id, leave_type=leave_type, ask_time=ask_time, start_time=startdatetime,
+                             end_time=enddatetime, reason=reason, destination=destination, approval_id=approval_id)
         return render(request, 'leavequery.html', locals())
 
     return render(request, 'leaveask.html', locals())
