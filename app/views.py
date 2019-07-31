@@ -224,18 +224,10 @@ def leave_ask(request):
 
 
 # 销假管理
-@is_login
-def leave_report_back(request):
-    (flag, user) = check_cookie(request)
-    emp = Employee.objects.get(user=user)
-
-    if request.method == 'POST':
-        leave_id = request.POST.get('leave_id')
-        leave = Leave.objects.get(leave_id=leave_id)
-        leave.report_back_time = datetime.datetime.now()
-        leave.save()
-    leave_list = Leave.objects.filter(employee=emp)
-    return render(request, 'leavequery.html', locals())
+# @is_login
+# def leave_report_back_success(request):
+#     (flag, user) = check_cookie(request)
+#     return render(request, 'leave_report_back_success.html')
 
 
 # 请假查询
@@ -243,6 +235,15 @@ def leave_report_back(request):
 def leave_query(request):
     (flag, user) = check_cookie(request)
     emp = Employee.objects.get(user=user)
+
+    if request.method == 'POST':
+        leave_id = request.POST.get('leave_id')
+        print('leave_report_back:leave_id:leave_id', leave_id)
+        leave = Leave.objects.get(employee=emp, leave_id=leave_id)
+        leave.report_back_time = datetime.datetime.now()
+        leave.save()
+        return render(request, 'leave_report_back_success.html', locals())
+
     leave_list = Leave.objects.filter(employee=emp)
     return render(request, 'leavequery.html', locals())
 

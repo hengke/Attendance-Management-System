@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <div class="jumbotron">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">请假管理</h3>
+            </div>
+        </div>
+        <div class="panel-body">
+            <h2 class="text-center" style="color: #00aa00">{{ emp.full_name }}，您的{{ leave.leave_type }}（{{ leave.start_time }}-{{ leave.end_time }}）销假成功！</h2>
+        </div>
+    </div>
+
+{% endblock content %}
+{% block sidebar %}
+    6
+{% endblock sidebar %}
