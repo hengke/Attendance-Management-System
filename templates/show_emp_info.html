@@ -17,7 +17,7 @@
                     {% csrf_token %}
                     <tbody>
                         <tr>
-                            <td>用户名： </td><td>{{ emp.user.username }}</td>
+                            <td>用户名： </td><td>{{ emp.user }}</td>
                         </tr>
                         <tr>
                             <td>员工编号： </td><td>{{ emp.emp_num }}</td>
@@ -26,10 +26,10 @@
                             <td>姓名： </td><td>{{ emp.full_name }}</td>
                         </tr>
                         <tr>
-                            <td>部门： </td><td>{{ emp.department.name }}</td>
+                            <td>部门： </td><td>{{ emp.department }}</td>
                         </tr>
                         <tr>
-                            <td>职务： </td><td>{{ emp.user_type.caption }}</td>
+                            <td>职务： </td><td>{{ emp.user_type }}</td>
                         </tr>
                         <tr>
                             <td>性别： </td><td>{{ emp.gender }}</td>
@@ -44,7 +44,7 @@
                             <td>手机号码： </td><td>{{ emp.cell_phone }}</td>
                         </tr>
                         <tr>
-                            <td>Email: </td><td>{{ emp.user.email }}</td>
+                            <td>Email: </td><td>{{ user.email }}</td>
                         </tr>
                     </tbody>
                 </table>

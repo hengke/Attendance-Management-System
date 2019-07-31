@@ -142,11 +142,11 @@ $(function () {/* 文档加载，执行一个函数*/
             var bv = $form.data('bootstrapValidator');
 
             // Use Ajax to submit form data 提交至form标签中的action，result自定义
-            $.post('/register_verify/', $form.serialize(), function (result) {
+            $.post('/edit_emp_info/', $form.serialize(), function (result) {
 //do something...
                 if(result == 'OK'){
-                    alert("注册成功，请登录！")
-                    window.location.href='/login/'
+                    alert("修改成功！")
+                    window.location.href='/show_emp_info/'
                 }
             });
         });

@@ -162,8 +162,6 @@ def edit_emp_info(request):
     dept_list = Department.objects.all()
 
     if request.method == 'POST':
-        user = User.objects.get(username=request.POST.get('username'))
-        emp_num = request.POST.get('emp_num')
         department = Department.objects.get(name=request.POST.get('department'))
         user_type = UserType.objects.get(caption=request.POST.get('user_type'))
         full_name = request.POST.get('full_name')
@@ -172,27 +170,29 @@ def edit_emp_info(request):
         work_phone = request.POST.get('work_phone')
         cell_phone = request.POST.get('cell_phone')
         email = request.POST.get('email')
+
         user.email = email
+        emp.full_name = full_name
+        emp.department = department
+        emp.user_type = user_type
+        emp.gender = gender
+        emp.birth_date = birth_date
+        emp.work_phone = work_phone
+        emp.cell_phone = cell_phone
 
-        try:
-            emp = Employee.objects.get(user=user)
-            emp.emp_num = emp_num
-            emp.full_name = full_name
-            emp.department = department
-            emp.user_type = user_type
-            emp.gender = gender
-            emp.birth_date = birth_date
-            emp.work_phone = work_phone
-            emp.cell_phone = cell_phone
-        except Employee.DoesNotExist:
-            emp = Employee.objects.create(user=user, emp_num=emp_num, full_name=full_name, department=department,
-                                          gender=gender, birth_date=birth_date, work_phone=work_phone,
-                                          user_type=user_type, cell_phone=cell_phone)
-
+        user.save()
         emp.save()
-        return render(request, 'show_emp_info.html', locals())
+
+        return HttpResponse('OK')
 
     return render(request, 'edit_emp_info.html', locals())
+
+
+@is_login
+def show_emp_info(request):
+    (flag, rank) = check_cookie(request)
+    emp = Employee.objects.get(user=rank)
+    return render(request, 'show_emp_info.html', locals())
 
 
 # 请假申请
@@ -300,11 +300,6 @@ def register_verify(request):
         emp = Employee.objects.create(user=user, emp_num=emp_num, user_type_id=2, cell_phone=cell_phone)
         emp.save()
         return HttpResponse('OK')
-
-
-# 注册成功
-# def register_success(request):
-#     return render(request, 'register_success.html')
 
 
 # 签到统计
