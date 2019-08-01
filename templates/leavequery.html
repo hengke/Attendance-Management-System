@@ -37,12 +37,11 @@
                             <td>{{ att.leave_days }}</td>
                             {% if att.report_back_time is None %}
                                 <td>
-                                    <form id="defaultForm" action="/LeaveQuery/" method="post">
+                                    <form id="defaultForm" action="/LeaveQuery/" method="post" onsubmit="return sure_submit()">
                                         {% csrf_token %}
                                         <label style="color: #e50914">未销假</label>
-                                        <button class="btn btn-sm btn-primary" name="leave_id"  id="LeaveReportBack_btn"
-                                                value="{{ att.leave_id }}">销假
-                                        </button>
+                                        <input name="leave_id" style="display: none" value="{{ att.leave_id }}"></input>
+                                        <input type="submit" class="btn btn-sm btn-primary" value="销假"></input>
                                     </form>
                                 </td>
                             {% else %}
@@ -55,7 +54,16 @@
             </table>
         </div>
     </div>
-
+    <script>
+        function sure_submit() {
+            var gnl=confirm("确定要销假?");
+            if (gnl==true){
+                document.forms[0].submit();
+            }else{
+                return false;
+            };
+        }
+    </script>
 {% endblock content %}
 {% block sidebar %}
     6

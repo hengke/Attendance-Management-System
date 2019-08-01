@@ -130,24 +130,25 @@ $(function () {/* 文档加载，执行一个函数*/
             }
         })
 
-        //自动触发表单验证
-        .on('success.form.bv', function (e) {//点击提交之后
-            // Prevent form submission
-            e.preventDefault();
-
-            // Get the form instance
-            var $form = $(e.target);
-
-            // Get the BootstrapValidator instance
-            var bv = $form.data('bootstrapValidator');
-
-            // Use Ajax to submit form data 提交至form标签中的action，result自定义
-            $.post('/edit_emp_info/', $form.serialize(), function (result) {
-//do something...
-                if(result == 'OK'){
-                    alert("修改成功！")
-                    window.location.href='/show_emp_info/'
-                }
-            });
-        });
+//         //自动触发表单验证
+//         .on('success.form.bv', function (e) {//点击提交之后
+//             // Prevent form submission
+//             e.preventDefault();
+//
+//             // Get the form instance
+//             var $form = $(e.target);
+//
+//             // Get the BootstrapValidator instance
+//             var bv = $form.data('bootstrapValidator');
+//
+//             // Use Ajax to submit form data 提交至form标签中的action，result自定义
+//             $.post('/edit_emp_info/', $form.serialize(), function (result) {
+// //do something...
+//                 if(result == 'OK'){
+//                     alert("修改成功！")
+//                     window.location.href='/show_emp_info/'
+//                 }
+//             });
+//         });
 });
+

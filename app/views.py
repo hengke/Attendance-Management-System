@@ -182,17 +182,9 @@ def edit_emp_info(request):
 
         user.save()
         emp.save()
-
-        return HttpResponse('OK')
+        return render(request, 'show_emp_info.html', locals())
 
     return render(request, 'edit_emp_info.html', locals())
-
-
-@is_login
-def show_emp_info(request):
-    (flag, rank) = check_cookie(request)
-    emp = Employee.objects.get(user=rank)
-    return render(request, 'show_emp_info.html', locals())
 
 
 # 请假申请
@@ -241,13 +233,6 @@ def leave_ask(request):
         return render(request, 'leavequery.html', locals())
 
     return render(request, 'leaveask.html', locals())
-
-
-# 销假管理
-# @is_login
-# def leave_report_back_success(request):
-#     (flag, user) = check_cookie(request)
-#     return render(request, 'leave_report_back_success.html')
 
 
 # 请假查询

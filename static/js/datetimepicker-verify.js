@@ -11,6 +11,17 @@ $('.form_datetime').datetimepicker({
     showMeridian: 1,
     daysOfWeekDisabled: [0,6]
 });
+$('.birth_date').datetimepicker({
+    language:  'zh-CN',
+    format: 'yyyy-m-d',
+    weekStart: 1,
+    todayBtn:  1,
+    autoclose: 1,
+    startView: 2,
+    minView: 2,
+    forceParse: 0,
+    showMeridian: 1
+});
 $('.form_start_date').datetimepicker({
     language:  'zh-CN',
     format: 'yyyy-m-d',

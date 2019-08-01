@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="cf60e3c3-4e8d-44b1-882c-5eb797c494b1" name="Default" comment="1、为请假页面增加地区选择器，完善日期时间选择器&#10;2、将Leave表中的时间字段改为DateTimeFiled，相应更改模板和视图函数，在原只记录日期的基础上可以记录请假时间。">
-      <change afterPath="$PROJECT_DIR$/static/js/datetimepicker-verify.js" afterDir="false" />
+    <list default="true" id="cf60e3c3-4e8d-44b1-882c-5eb797c494b1" name="Default" comment="为请假、销假增加确认提示。">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/js/city-method.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/city-method.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/check.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/check.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mysite/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/mysite/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/js/datetimepicker-verify.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/datetimepicker-verify.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/js/edit-emp-info.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/edit-emp-info.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/edit_emp_info.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/edit_emp_info.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/leaveask.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/leaveask.html" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -312,6 +314,7 @@
       <workItem from="1564533479844" duration="17841000" />
       <workItem from="1564569114324" duration="11897000" />
       <workItem from="1564621751890" duration="18585000" />
+      <workItem from="1564655012988" duration="8279000" />
     </task>
     <task id="LOCAL-00001" summary="专业添加及删除">
       <created>1522326851997</created>
@@ -397,7 +400,14 @@
       <option name="project" value="LOCAL" />
       <updated>1564560572523</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="为请假、销假增加确认提示。">
+      <created>1564657274942</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1564657274943</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -448,7 +458,8 @@
     <MESSAGE value="完成注册功能" />
     <MESSAGE value="为“员工信息编辑”编辑页面增加实时验证功能" />
     <MESSAGE value="增加销假成功提示页" />
-    <option name="LAST_COMMIT_MESSAGE" value="增加销假成功提示页" />
+    <MESSAGE value="为请假、销假增加确认提示。" />
+    <option name="LAST_COMMIT_MESSAGE" value="为请假、销假增加确认提示。" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Attendance_Management_System$loaddata.coverage" NAME="loaddata Coverage Results" MODIFIED="1564453475617" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app" />
