@@ -3,15 +3,16 @@
 //*https://github.com/visugar/FrontEnd-examples*//
 
 /*根据id获取对象*/
-function $(str) {
-    return document.getElementById(str);
-}
+//会影响其他js文件中使用$()
+// function $(str) {
+//     return document.getElementById(str);
+// }
 
-var addrShow = $('destination');
-var butn = document.getElementsByClassName('met1')[0];
-var prov = $('prov');
-var city = $('city');
-var country = $('country');
+var addrShow = document.getElementById('destination');
+var but = document.getElementsByClassName('met1')[0];
+var prov = document.getElementById('prov');
+var city = document.getElementById('city');
+var country = document.getElementById('country');
 
 
 /*用于保存当前所选的省市区*/
@@ -23,7 +24,7 @@ var current_region = {
 
 /*自动加载省份列表*/
 (function showProv() {
-    butn.disabled = true;
+    but.disabled = true;
     var len = provice.length;
     for (var i = 0; i < len; i++) {
         var provOpt = document.createElement('option');
@@ -39,7 +40,7 @@ function showCity(obj) {
     if (val !== current_region.prov) {
         current_region.prov = val;
         addrShow.value = '';
-        butn.disabled = true;
+        but.disabled = true;
     }
     //console.log(val);
     if (val != null) {
@@ -78,7 +79,7 @@ function showCountry(obj) {
 function selecCountry(obj) {
     current_region.country = obj.options[obj.selectedIndex].value;
     if ((current_region.city != null) && (current_region.country != null)) {
-        butn.disabled = false;
+        but.disabled = false;
     }
 }
 

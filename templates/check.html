@@ -123,7 +123,7 @@
         $('.jumbotron').on('click', '#sign_btn', function () {
             $.post('/check/', {'sign':"{{ sign_flag }}"}, function (ret) {
                 // window.location.reload(true)
-                alert('操作成功')
+                alert('签到成功！')
                 window.location.reload(true)
             })
 

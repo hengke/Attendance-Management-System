@@ -18,7 +18,7 @@
                     <div class="form-group">
                         <label for="leaveType" class="col-sm-3 control-label">假别：</label>
                         <div class='col-sm-3'>
-                            <select class="form-control" id="leaveType" name="leaveType">
+                            <select class="form-control" id="leaveType" name="leaveType" onchange="checkField(this.value)">
                                 {% for leave_type in leave_type_list %}
                                         <option value="{{ leave_type.name }}">{{ leave_type.name }}</option>
                                 {% endfor %}
@@ -42,30 +42,33 @@
 {#                    </div>#}
                     <div class="form-group">
                         <label for="dtp_input1" class="col-sm-3 control-label">开始日期：</label>
-                        <div class="input-group date form_date col-sm-3" data-link-field="dtp_input3" data-link-format="yyyy-mm-dd">
-                            <input class="form-control" size="16" type="text"  name="startdate" value="" readonly>
-        {#                    <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>#}
+                        <div class="input-group date form_start_date col-sm-3" data-link-field="dtp_input1" data-link-format="yyyy-mm-dd">
+                            <input class="form-control" size="16" type="text" name="startdate" value="" readonly>
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
                             <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" id="div_start_time" style="display:none">
                         <label for="dtp_input2" class="col-sm-3 control-label">开始时间：</label>
-                        <div class="input-group date form_time col-sm-3" data-link-field="dtp_input3" data-link-format="hh:ii">
+                        <div class="input-group date form_start_time col-sm-3" data-link-field="dtp_input2" data-link-format="hh:ii">
                             <input class="form-control" size="16" type="text" name="starttime" value="" readonly>
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
                             <span class="input-group-addon"><span class="glyphicon glyphicon-time"></span></span>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="dtp_input3" class="col-sm-3 control-label">结束日期：</label>
-                        <div class="input-group date form_date col-sm-3" data-link-field="dtp_input3" data-link-format="yyyy-mm-dd">
+                        <div class="input-group date form_end_date col-sm-3" data-link-field="dtp_input3" data-link-format="yyyy-mm-dd">
                             <input class="form-control" size="16" type="text" name="enddate" value="" readonly>
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
                             <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group"  id="div_end_time" style="display:none">
                         <label for="dtp_input4" class="col-sm-3 control-label">结束时间：</label>
-                        <div class="input-group date form_time col-sm-3" data-link-field="dtp_input4" data-link-format="hh:ii">
+                        <div class="input-group date form_end_time col-sm-3" data-link-field="dtp_input4" data-link-format="hh:ii">
                             <input class="form-control" size="16" type="text" name="endtime" value="" readonly>
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
                             <span class="input-group-addon"><span class="glyphicon glyphicon-time"></span></span>
                         </div>
                     </div>
@@ -76,7 +79,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <div class="col-sm-6 col-sm-offset-2">
+                        <div class="col-sm-6 col-sm-offset-3">
                             <!--省份选择-->
                             <select id="prov" onchange="showCity(this)">
                                 <option>=请选择省份=</option>
@@ -120,44 +123,19 @@
 {#            })#}
 {#        });#}
 {#    </script>#}
-    <script type="text/javascript">
-        $('.form_datetime').datetimepicker({
-            language:  'zh-CN',
-            format: 'yyyy-mm-dd hh:ii',
-            weekStart: 1,
-            todayBtn:  1,
-            autoclose: 1,
-            todayHighlight: 1,
-            startView: 2,
-            forceParse: 0,
-            showMeridian: 1
-        });
-        $('.form_date').datetimepicker({
-            language:  'zh-CN',
-            format: 'yyyy-mm-dd',
-            weekStart: 1,
-            todayBtn:  1,
-            autoclose: 1,
-            todayHighlight: 1,
-            startView: 2,
-            minView: 2,
-            forceParse: 0
-        });
-        $('.form_time').datetimepicker({
-            language:  'zh-CN',
-            format: 'hh:ii',
-            weekStart: 1,
-            todayBtn:  1,
-            autoclose: 1,
-            todayHighlight: 1,
-            startView: 1,
-            minView: 0,
-            maxView: 1,
-            forceParse: 0
+        <script>
+        $('.panel-body').on('submit', '#sign_btn', function () {
+            $.post('/LeaveAsk/', {'sign':"{{ sign_flag }}"}, function (ret) {
+                var gnl=confirm("确定要提交?");
+                if (gnl==true){
+                    return true;
+                }else{
+                    return false;
+                };
+            })
         });
     </script>
-
-{#    只有将两个city js文件放在最后bootstrap-datetimepicker.js才能用，为什么呢？？？？？？#}
+    <script type="text/javascript" src="/static/js/datetimepicker-verify.js"></script>
     <script type="text/javascript" src="/static/js/city-data.js"></script>
     <script type="text/javascript" src="/static/js/city-method.js"></script>
 {% endblock content %}
