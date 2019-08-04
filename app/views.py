@@ -3,7 +3,8 @@ from django.contrib.auth.models import User
 from .forms import loginForm
 from django.contrib.auth import authenticate, login
 from .api import check_cookie, DecimalEncoder, is_login
-from .models import UserType, Employee, Department, Notice, Leave, HolidayArrangements, Signingin, LeaveType
+from .models import UserType, Employee, Department, Notice, Leave, HolidayArrangements, Signingin, \
+    WorkTime, LeaveType, EveryDayArrangements
 # django自带加密解密库
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import F, Q, Avg, Sum, Max, Min, Count
@@ -68,30 +69,44 @@ def login(request):
 
 def check(request):
     (flag, rank) = check_cookie(request)
-    user = rank
-    # cur_day = datetime.date.today()
-    # cur_time = datetime.datetime.now().time()
-    # if cur_day is workday:
-    #     is_workday = True
-    # else:
-    #     is_workday = False
-    #
-    # if cur_day is legal_holiday:
-    #     is_legal_holidays = True
-    # else:
-    #     is_legal_holidays = False
-    #
-    # if cur_time is worktime:
-    #     is_worktime = True
-    # else:
-    #     is_worktime = False
-    #
-    # if 员工在休假中:
-    #     is_in_leaving = True
-    # else:
-    #     is_in_leaving = False
 
     if flag:  # flag为True时，rank为user
+        user = rank
+        try:
+            emp = Employee.objects.get(user=user)
+        except Employee.DoesNotExist:
+            emp = None
+            return render(request, 'edit_emp_info.html', locals())
+        # print('emp:' + str(emp))
+        try:
+            cur_day = EveryDayArrangements.objects.get(date=datetime.date.today())
+        except EveryDayArrangements.DoesNotExist:
+            return render(request, 'page-login.html', {'error_msg': "EveryDayArrangements: Cann't find " + cur_day})
+        # print('cur_day:' + str(cur_day.date))
+        try:
+            worktime = WorkTime.objects.filter(name='普通')
+        except EveryDayArrangements.DoesNotExist:
+            return render(request, 'page-login.html', {'error_msg': "WorkTime: Cann't find " + '普通'})
+        cur_time = datetime.datetime.now().time()
+        # print('cur_time:' + str(cur_time))
+        # 判断是否是工作时间内，
+        if cur_day.is_workday:
+            if cur_time > worktime[0].start_time and cur_time < worktime[0].end_time:
+                is_worktime = True
+            elif cur_time > worktime[1].start_time and cur_time < worktime[1].end_time:
+                is_worktime = True
+            else:
+                is_worktime = False
+        else:
+            is_worktime = False
+        # print('is_worktime:' + str(is_worktime))
+        # 判断员工是否休假中
+        try:
+            leave_list = Leave.objects.filter(employee=emp, end_time__gt=cur_day.date)
+            is_in_leaving = True
+        except Leave.DoesNotExist:
+            is_in_leaving = False
+        # print('is_in_leaving:' + str(is_in_leaving))
         #
         # if workday and worktime:
         #     if not is_in_leaving:
@@ -107,11 +122,6 @@ def check(request):
         #     签到，并创建加班记录，填写加班内容，备注节日加班
         # else:
         #     签到，并创建加班记录，填写加班内容，备注普通加班
-        try:
-            emp = Employee.objects.get(user=user)
-        except Employee.DoesNotExist:
-            emp = None
-            return render(request, 'edit_emp_info.html', locals())
 
         if request.method == 'POST':
             sign_flag = request.POST.get('sign')
@@ -122,31 +132,35 @@ def check(request):
                 cur_attendent = Signingin.objects.filter(employee=emp, end_time=None)
                 tmp_time = datetime.datetime.now()
                 duration = round((tmp_time - cur_attendent.last().start_time).seconds / 3600, 1)
-
                 cur_attendent.update(end_time=tmp_time, duration=duration)
             return HttpResponse(request, '操作成功')
         else:
-            # 查询上一个签到的状态
-            pre_att = Signingin.objects.filter(employee=emp).order_by('start_time').last()
-            # print('check:pre_att', pre_att)
-            if pre_att:
-                # 如果当前时间距上次签到时间超过六小时，并且上次签退时间等于签到时间
-                if (datetime.datetime.now() - pre_att.start_time.replace(
-                        tzinfo=None)).seconds / 3600 > 6 and pre_att.end_time == None:
-                    pre_att.delete()
+            try:
+                print('开始')
+                pre_atts = Signingin.objects.filter(employee=emp, end_time=None)
+                if len(pre_atts) == 0:
                     sign_flag = True
-
-                elif (datetime.datetime.now() - pre_att.start_time.replace(
-                        tzinfo=None)).seconds / 3600 < 6 and pre_att.end_time == None:
-                    sign_flag = False
+                # elif cur_time > datetime.time(6,0,0) and cur_time < datetime.time(7,0,0):
+                #     # 查询上一个签到的状态，没有签退的全部自动签退，签退时间设置为相应上下午下班时间
+                #     for pre_att in pre_atts:
+                #         print(pre_att.start_time.time())
+                #         if pre_att.start_time.time() >= worktime[1].end_time or \
+                #                 pre_att.start_time.time() >= worktime[1].start_time:
+                #             pre_att.end_time = cur_day.datetime + worktime[1].end_time
+                #         else:
+                #             pre_att.end_time = cur_day.datetime + worktime[0].end_time
+                #
+                #     sign_flag = True
                 else:
-                    sign_flag = True
-            else:
-                sign_flag = True
-            att_list = Signingin.objects.filter(employee=emp).order_by('-id')
+                    sign_flag = False
+            except Signingin.DoesNotExist:
+                pass
+
+            att_list = Signingin.objects.filter(start_time__gt=(cur_day.date + datetime.timedelta(days=-10)),
+                                                employee=emp).order_by('-id')
             return render(request, 'check.html', locals())
     else:
-        return render(request, 'page-login.html', {'error_msg': ''})
+        return render(request, 'page-login.html', {'error_msg': '您未登录，请登录！'})
 
 
 # 编辑员工信息
