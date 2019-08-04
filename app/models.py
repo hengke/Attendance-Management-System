@@ -48,6 +48,16 @@ class HolidayArrangements(models.Model):
         ordering = ['date']
 
 
+class EveryDayArrangements(models.Model):
+    date = models.DateField(null=False, verbose_name='日期')
+    weekday = models.IntegerField(verbose_name='星期')
+    is_workday = models.BooleanField(default=False, verbose_name='是工作日')
+    is_holiday = models.BooleanField(default=False, verbose_name='是否节假日')
+    is_legal_holiday = models.BooleanField(default=False, verbose_name='是否法定节假日')
+    holiday_name = models.TextField(default='', blank=True, max_length=100, verbose_name='节假日名称')
+    remarks = models.TextField(default='', blank=True, max_length=100, verbose_name='备注')
+
+
 # 休假类别
 class LeaveType(models.Model):
     name = models.TextField(max_length=20, verbose_name='假别')
