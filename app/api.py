@@ -9,12 +9,12 @@ import decimal
 
 def check_cookie(request):
     d = request.COOKIES.keys()
-    print("check_cookie:keys", d)
+    # print("check_cookie:keys", d)
     if "qwer" in d and "asdf" in d:
         username = request.COOKIES['qwer']
         password = request.COOKIES['asdf']
-        print("check_cookie:username", username)
-        print("check_cookie:password", password)
+        # print("check_cookie:username", username)
+        # print("check_cookie:password", password)
         # select_user = Employee.objects.filter(employee__username=username).filter(employee__password=password)
         # select_user = User.objects.filter(username=username).filter(password=password)
         # if len(select_user) == 0:

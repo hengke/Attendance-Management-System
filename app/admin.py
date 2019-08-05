@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
 from .models import UserType, Employee, Department, Leave, Notice, Signingin
-from .models import WorkTime, HolidayName, HolidayArrangements, LeaveType, WorkOvertime
+from .models import WorkTime, HolidayName, HolidayArrangements, LeaveType
 
 
 # Register your models here.
@@ -86,7 +86,7 @@ admin.site.register(Department, DepartmentAdmin)
 admin.site.register(Leave, LeaveAdmin)
 # admin.site.register(Signingin, SigninginAdmin)
 admin.site.register(Notice, NoticeAdmin)
-admin.site.register(WorkOvertime, WorkOvertimeAdmin)
+# admin.site.register(WorkOvertime, WorkOvertimeAdmin)
 # admin.site.register(ExamContent, ExamContentAdmin)
 # admin.site.register(Exam, ExamAdmin)
 

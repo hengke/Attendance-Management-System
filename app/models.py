@@ -176,6 +176,12 @@ class Signingin(models.Model):
     end_time = models.DateTimeField(null=True, blank=True, verbose_name='签退时间')
     duration = models.DecimalField(max_digits=5, decimal_places=2, default=0, verbose_name='时长')
     is_auto_signout =  models.BooleanField(default=False, verbose_name='是否系统自动签退')
+    is_come_late = models.BooleanField(default=False, verbose_name='是否迟到')
+    is_left_early = models.BooleanField(default=False, verbose_name='是否早退')
+    is_legal_holiday = models.BooleanField(default=False, verbose_name='是否节日加班')
+    is_holiday = models.BooleanField(default=False, verbose_name='是否加班')
+    is_night = models.BooleanField(default=False, verbose_name='是否夜班')
+    reason = models.TextField(default='', max_length=500, verbose_name='原因')
     remarks = models.TextField(default='', verbose_name='备注')
 
     def __str__(self):
@@ -183,11 +189,14 @@ class Signingin(models.Model):
 
 
 # 加班记录表
-class WorkOvertime(models.Model):
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    start_time = models.DateTimeField(null=True, blank=True, verbose_name='签到时间')
-    end_time = models.DateTimeField(null=True, blank=True, verbose_name='签退时间')
-    duration = models.DecimalField(max_digits=5, decimal_places=2, default=0, verbose_name='时长')
+# class WorkOvertime(models.Model):
+#     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+#     start_time = models.DateTimeField(null=True, blank=True, verbose_name='签到时间')
+#     end_time = models.DateTimeField(null=True, blank=True, verbose_name='签退时间')
+#     is_legal_holiday = models.BooleanField(default=False, verbose_name='是否节日加班')
+#     is_holiday = models.BooleanField(default=False, verbose_name='是否加班')
+#     is_night = models.BooleanField(default=False, verbose_name='是否夜班')
+#     duration = models.DecimalField(max_digits=5, decimal_places=2, default=0, verbose_name='时长')
 
 
 # 公告表设计

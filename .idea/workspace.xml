@@ -2,8 +2,26 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cf60e3c3-4e8d-44b1-882c-5eb797c494b1" name="Default" comment="根据节假日安排表生成EveryDayArrangements表（一年中每天是否工作日、节假日、法定节假日、调休等）">
-      <change afterPath="$PROJECT_DIR$/app/migrations/0015_signingin_remarks.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/d4004c36-2994-4cc3-8edd-404960324b58.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/d4004c36-2994-4cc3-8edd-404960324b58.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/api.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/migrations/0002_auto_20190723_1524.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/migrations/0003_auto_20190724_1423.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/migrations/0004_auto_20190724_1535.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/migrations/0005_auto_20190728_2228.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/migrations/0006_auto_20190728_2256.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/migrations/0007_auto_20190729_1049.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/migrations/0008_auto_20190729_1055.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/migrations/0009_auto_20190729_1058.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/migrations/0010_auto_20190730_0931.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/migrations/0011_auto_20190731_2248.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/migrations/0012_workdayarrangements.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/migrations/0013_auto_20190804_0916.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/migrations/0014_everydayarrangements_weekday.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/migrations/0015_signingin_remarks.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/migrations/0016_signingin_is_auto_signout.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/app/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
@@ -316,6 +334,7 @@
       <workItem from="1564879760196" duration="8353000" />
       <workItem from="1564888472218" duration="1523000" />
       <workItem from="1564911783563" duration="10495000" />
+      <workItem from="1564964609725" duration="24078000" />
     </task>
     <task id="LOCAL-00001" summary="专业添加及删除">
       <created>1522326851997</created>
@@ -422,7 +441,14 @@
       <option name="project" value="LOCAL" />
       <updated>1564887970679</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="增加自动签退功能">
+      <created>1564983096213</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1564983096213</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -476,7 +502,8 @@
     <MESSAGE value="为请假、销假增加确认提示。" />
     <MESSAGE value="为员工信息编辑页增加确认提示，生日输入统一为请假页面日期样式" />
     <MESSAGE value="根据节假日安排表生成EveryDayArrangements表（一年中每天是否工作日、节假日、法定节假日、调休等）" />
-    <option name="LAST_COMMIT_MESSAGE" value="根据节假日安排表生成EveryDayArrangements表（一年中每天是否工作日、节假日、法定节假日、调休等）" />
+    <MESSAGE value="增加自动签退功能" />
+    <option name="LAST_COMMIT_MESSAGE" value="增加自动签退功能" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Attendance_Management_System$loaddata.coverage" NAME="loaddata Coverage Results" MODIFIED="1564887742702" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app" />

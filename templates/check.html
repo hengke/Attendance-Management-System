@@ -11,7 +11,15 @@
                         <p style="color: red">系统中没有您的姓名，请编辑您的员工信息！</p>
                     {% else %}
                         {{ emp.full_name }}
-{#                        （{{ user.username }}）#}
+                    {% endifequal %}
+                    {% ifequal is_in_leaving True %}
+                        <p style="color: red">您正在休假中！</p>
+                    {% endifequal %}
+                    {% ifequal cur_day.is_holiday True %}
+                        <p style="color: red">今天是{{ cur_day.holiday_name }}，祝您{{ cur_day.holiday_name }}快乐！</p>
+                    {% endifequal %}
+                    {% ifequal wot.is_night True %}
+                        <p style="color: red">现在是晚上，您辛苦了！</p>
                     {% endifequal %}
                 </h2>
                 <p>今天又是全新的一天，我想您今天已经有了自己的计划，加油！<img width="30" height="30" src="/static/img/quantou1.jpg"></p>
@@ -55,11 +63,16 @@
                 <table class="table table-striped">
                     <thead>
                     <tr>
-                        <th>员工编号</th>
-                        <th>姓名</th>
                         <th>签到时间</th>
                         <th>签退时间</th>
                         <th>时长</th>
+                        <th>自动签退</th>
+                        <th>迟到</th>
+                        <th>早退</th>
+                        <th>加班</th>
+                        <th>节日加班</th>
+                        <th>夜班</th>
+                        <th>原因</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -69,8 +82,6 @@
 {#                                    style="color: #a50718;font-weight:bold"#}
 {#                                {% endifequal %}#}
                         >
-                            <td>{{ att.employee.emp_num }}</td>
-                            <td>{{ att.employee.full_name }}</td>
                             <td>{{ att.start_time }}</td>
                             <td>{{ att.end_time }}</td>
                             {% ifequal att.end_time None %}
@@ -78,7 +89,38 @@
                             {% else %}
                                 <td>{{ att.start_time | timesince:att.end_time }}</td>
                             {% endifequal %}
-                        </tr>
+                            {% ifequal att.is_auto_signout False %}
+                                <td></td>
+                            {% else %}
+                                <td>是</td>
+                            {% endifequal %}
+                            {% ifequal att.is_come_late False %}
+                                <td></td>
+                            {% else %}
+                                <td>是</td>
+                            {% endifequal %}
+                            {% ifequal att.is_left_early False %}
+                                <td></td>
+                            {% else %}
+                                <td>是</td>
+                            {% endifequal %}
+                            {% ifequal att.is_holiday False %}
+                                <td></td>
+                            {% else %}
+                                <td>是</td>
+                            {% endifequal %}
+                            {% ifequal att.is_legal_holiday False %}
+                                <td></td>
+                            {% else %}
+                                <td>是</td>
+                            {% endifequal %}
+                            {% ifequal att.is_night False %}
+                                <td></td>
+                            {% else %}
+                                <td>是</td>
+                            {% endifequal %}
+                            <td>{{ att.reason }}</td>
+                       </tr>
                     {% endfor %}
                     </tbody>
                 </table>

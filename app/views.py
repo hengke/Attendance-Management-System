@@ -50,12 +50,13 @@ def login(request):
                 try:
                     # 尝试获取此用户名对应的员工，有则跳到签到页面，没有则跳转到员工信息编辑页面
                     emp = Employee.objects.get(user=user)
+                except Employee.DoesNotExist:
+                    return render(request, 'edit_emp_info.html', locals())
+                else:
                     response = redirect('/index/')
                     response.set_cookie('qwer', username, 3600)
                     response.set_cookie('asdf', password, 3600)
                     return response
-                except Employee.DoesNotExist:
-                    return render(request, 'edit_emp_info.html', locals())
             else:
                 return render(request, 'page-login.html', {'error_msg': '账户未激活！请联系管理员！'})
         else:
@@ -78,16 +79,27 @@ def check(request):
             emp = None
             return render(request, 'edit_emp_info.html', locals())
         # print('emp:' + str(emp))
+        cur_datetime = datetime.datetime.now()
+        test = True
+        if test is True:
+            cur_datetime = datetime.datetime(2019, 4, 8, 8, 30, 0)
+
+        cur_date = cur_datetime.date()
+        cur_time = cur_datetime.time()
+        # test = False
+
         try:
-            cur_day = EveryDayArrangements.objects.get(date=datetime.date.today())
+            cur_day = EveryDayArrangements.objects.get(date=cur_date)
         except EveryDayArrangements.DoesNotExist:
-            return render(request, 'page-login.html', {'error_msg': "EveryDayArrangements: Cann't find " + cur_day})
+            return render(request, 'page-login.html', {'error_msg': "EveryDayArrangements: Cann't find " + str(cur_date)})
         # print('cur_day:' + str(cur_day.date))
+
         try:
             worktime = WorkTime.objects.filter(name='普通')
         except EveryDayArrangements.DoesNotExist:
             return render(request, 'page-login.html', {'error_msg': "WorkTime: Cann't find " + '普通'})
-        cur_time = datetime.datetime.now().time()
+
+        # tdelta = datetime.timedelta(days=12)
         # print('cur_time:' + str(cur_time))
         # 判断是否是工作时间内，
         if cur_day.is_workday:
@@ -102,10 +114,15 @@ def check(request):
         # print('is_worktime:' + str(is_worktime))
         # 判断员工是否休假中
         try:
-            leave_list = Leave.objects.filter(employee=emp, end_time__gt=cur_day.date)
-            is_in_leaving = True
+            leave_list = Leave.objects.filter(employee=emp, report_back_time__isnull=True)
         except Leave.DoesNotExist:
-            is_in_leaving = False
+            pass
+        else:
+            if len(leave_list) == 0:
+                is_in_leaving = False
+            else:
+                is_in_leaving = True
+
         # print('is_in_leaving:' + str(is_in_leaving))
         #
         # if workday and worktime:
@@ -129,12 +146,32 @@ def check(request):
             if sign_flag == 'True':  # 签到，创建记录
                 # start_time = datetime.datetime(2019, 8, 5, 14, 45, 0)
                 # Signingin.objects.create(employee=emp, start_time=start_time)
-                Signingin.objects.create(employee=emp, start_time=datetime.datetime.now())
+                sign = Signingin(employee=emp, start_time=cur_datetime)
+                # print(sign.__dict__)
+
+                # sign.save()
+                if is_in_leaving:
+                    sign.is_holiday = True
+                    sign.remarks = '休假中加班'
+                elif not is_worktime:
+                    # 加班，包括夜班
+                    if cur_day.is_legal_holiday:
+                        sign.is_legal_holiday = True
+                    if cur_day.is_holiday:
+                        sign.is_holiday = True
+                    if cur_time > datetime.time(19, 0, 0):
+                        sign.is_night = True
+                else:
+                    sign.is_come_late = True
+                # print(sign.__dict__)
+                sign.save()
             elif sign_flag == 'False':  # 签退，更新签退时间和时长
+                is_left_early = False
+                if is_worktime:
+                    is_left_early = True
                 cur_attendent = Signingin.objects.filter(employee=emp, end_time=None)
-                tmp_time = datetime.datetime.now()
-                duration = round((tmp_time - cur_attendent.last().start_time).seconds / 3600, 1)
-                cur_attendent.update(end_time=tmp_time, duration=duration)
+                duration = round((cur_datetime - cur_attendent.last().start_time).seconds / 3600, 1)
+                cur_attendent.update(end_time=cur_datetime, duration=duration, is_left_early=is_left_early)
             return HttpResponse(request, '操作成功')
         else:
             try:
@@ -143,28 +180,50 @@ def check(request):
                 # print('开始')
                 # cur_time = datetime.time(18,0,0)
                 pre_atts = Signingin.objects.filter(employee=emp, end_time=None)
-                if len(pre_atts) == 0:
-                    sign_flag = True
-                elif cur_time > worktime[1].end_time and pre_atts.last().start_time.time() > worktime[1].start_time:
-                    end_time = datetime.datetime.strptime(pre_atts.last().start_time.strftime(
-                        '%Y-%m-%d') + ' ' + worktime[1].end_time.strftime('%H:%M:%S'), '%Y-%m-%d %H:%M:%S')
-                    duration = round((end_time - pre_atts.last().start_time).seconds / 3600, 1)
-                    pre_atts.update(end_time=end_time, duration=duration, is_auto_signout=True)
-                    is_auto_signout = True
-                    sign_flag = True
-                elif cur_time > worktime[0].end_time:
-                    end_time = datetime.datetime.strptime(pre_atts.last().start_time.strftime(
-                        '%Y-%m-%d') + ' ' + worktime[0].end_time.strftime('%H:%M:%S'), '%Y-%m-%d %H:%M:%S')
-                    duration = round((end_time - pre_atts.last().start_time).seconds / 3600, 1)
-                    pre_atts.update(end_time=end_time, duration=duration, is_auto_signout=True)
-                    is_auto_signout = True
-                    sign_flag = True
-                else:
-                    sign_flag = False
             except Signingin.DoesNotExist:
                 pass
+            else:
+                if len(pre_atts) == 0:
+                    sign_flag = True
+                else:
+                    print(len(pre_atts))
+                    print(cur_time)
+                    for pre_att in pre_atts:
+                        # print(pre_att.__dict__)
+                        sign_day_worktime = [{'start_time': datetime.datetime.strptime(pre_att.start_time.strftime(
+                                '%Y-%m-%d') + ' ' + worktime[0].start_time.strftime('%H:%M:%S'), '%Y-%m-%d %H:%M:%S'),
+                                'end_time': datetime.datetime.strptime(pre_att.start_time.strftime(
+                                '%Y-%m-%d') + ' ' + worktime[0].end_time.strftime('%H:%M:%S'), '%Y-%m-%d %H:%M:%S')},
 
-            att_list = Signingin.objects.filter(start_time__gt=(cur_day.date + datetime.timedelta(days=-10)),
+                                             {'start_time': datetime.datetime.strptime(pre_att.start_time.strftime(
+                                '%Y-%m-%d') + ' ' + worktime[1].start_time.strftime('%H:%M:%S'), '%Y-%m-%d %H:%M:%S'),
+                                'end_time': datetime.datetime.strptime(pre_att.start_time.strftime(
+                                '%Y-%m-%d') + ' ' + worktime[1].end_time.strftime('%H:%M:%S'), '%Y-%m-%d %H:%M:%S')}]
+                        # sign_day_cur_datetime = datetime.datetime.strptime(pre_att.start_time.strftime('%Y-%m-%d') +
+                        #                     ' ' + cur_time.strftime('%H:%M:%S'), '%Y-%m-%d %H:%M:%S')
+                        sign_day_cur_datetime = cur_datetime
+                        print(sign_day_worktime)
+                        print(sign_day_cur_datetime)
+                        if sign_day_cur_datetime > sign_day_worktime[1]['end_time'] and pre_att.start_time.time() < sign_day_worktime[1]['end_time']:
+                            end_time = sign_day_worktime[1]['end_time']
+                            duration = round((end_time - pre_att.start_time).seconds / 3600, 1)
+                            pre_atts.update(end_time=end_time, duration=duration, is_auto_signout=True)
+                            is_auto_signout = True
+                            sign_flag = True
+                        elif sign_day_cur_datetime > sign_day_worktime[0]['end_time'] and sign_day_cur_datetime < sign_day_worktime[1]['start_time'] and \
+                                pre_att.start_time.time() < worktime[0]['start_time']:
+                            end_time = sign_day_worktime[0]['end_time']
+                            duration = round((end_time - pre_att.start_time).seconds / 3600, 1)
+                            pre_atts.update(end_time=end_time, duration=duration, is_auto_signout=True)
+                            # print(worktime[0].end_time)
+                            # print(end_time)
+                            # print(pre_att.start_time.time())
+                            is_auto_signout = True
+                            sign_flag = True
+                        else:
+                            sign_flag = False
+
+            att_list = Signingin.objects.filter(start_time__gt=(cur_date + datetime.timedelta(days=-10)),
                                                 employee=emp).order_by('-id')
             return render(request, 'check.html', locals())
     else:
@@ -250,8 +309,9 @@ def leave_ask(request):
         leave_id = datetime.datetime.now().strftime('%Y%m%d%s%f')
         approval_id = datetime.datetime.now().strftime('%Y%m%d%s%f')
 
-        Leave.objects.create(employee=emp, leave_id=leave_id, leave_type=leave_type, ask_time=ask_time, start_time=startdatetime,
-                             end_time=enddatetime, reason=reason, destination=destination, approval_id=approval_id)
+        Leave.objects.create(employee=emp, leave_id=leave_id, leave_type=leave_type, ask_time=ask_time,
+                             start_time=startdatetime, end_time=enddatetime, reason=reason, destination=destination,
+                             approval_id=approval_id)
         return render(request, 'leavequery.html', locals())
 
     return render(request, 'leaveask.html', locals())
