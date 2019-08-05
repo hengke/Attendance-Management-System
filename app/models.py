@@ -175,6 +175,7 @@ class Signingin(models.Model):
     start_time = models.DateTimeField(null=True, blank=True, verbose_name='签到时间')
     end_time = models.DateTimeField(null=True, blank=True, verbose_name='签退时间')
     duration = models.DecimalField(max_digits=5, decimal_places=2, default=0, verbose_name='时长')
+    is_auto_signout =  models.BooleanField(default=False, verbose_name='是否系统自动签退')
     remarks = models.TextField(default='', verbose_name='备注')
 
     def __str__(self):

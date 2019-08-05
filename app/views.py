@@ -127,6 +127,8 @@ def check(request):
             sign_flag = request.POST.get('sign')
             # print('check:sign_flag', type(sign_flag), sign_flag)
             if sign_flag == 'True':  # 签到，创建记录
+                # start_time = datetime.datetime(2019, 8, 5, 14, 45, 0)
+                # Signingin.objects.create(employee=emp, start_time=start_time)
                 Signingin.objects.create(employee=emp, start_time=datetime.datetime.now())
             elif sign_flag == 'False':  # 签退，更新签退时间和时长
                 cur_attendent = Signingin.objects.filter(employee=emp, end_time=None)
@@ -136,21 +138,27 @@ def check(request):
             return HttpResponse(request, '操作成功')
         else:
             try:
-                print('开始')
+                # datetime.time(6,0,0) and cur_time < datetime.time(7,0,0):
+                # # 查询上一个签到的状态，没有签退的全部自动签退，签退时间设置为相应上下午下班时间
+                # print('开始')
+                # cur_time = datetime.time(18,0,0)
                 pre_atts = Signingin.objects.filter(employee=emp, end_time=None)
                 if len(pre_atts) == 0:
                     sign_flag = True
-                # elif cur_time > datetime.time(6,0,0) and cur_time < datetime.time(7,0,0):
-                #     # 查询上一个签到的状态，没有签退的全部自动签退，签退时间设置为相应上下午下班时间
-                #     for pre_att in pre_atts:
-                #         print(pre_att.start_time.time())
-                #         if pre_att.start_time.time() >= worktime[1].end_time or \
-                #                 pre_att.start_time.time() >= worktime[1].start_time:
-                #             pre_att.end_time = cur_day.datetime + worktime[1].end_time
-                #         else:
-                #             pre_att.end_time = cur_day.datetime + worktime[0].end_time
-                #
-                #     sign_flag = True
+                elif cur_time > worktime[1].end_time and pre_atts.last().start_time.time() > worktime[1].start_time:
+                    end_time = datetime.datetime.strptime(pre_atts.last().start_time.strftime(
+                        '%Y-%m-%d') + ' ' + worktime[1].end_time.strftime('%H:%M:%S'), '%Y-%m-%d %H:%M:%S')
+                    duration = round((end_time - pre_atts.last().start_time).seconds / 3600, 1)
+                    pre_atts.update(end_time=end_time, duration=duration, is_auto_signout=True)
+                    is_auto_signout = True
+                    sign_flag = True
+                elif cur_time > worktime[0].end_time:
+                    end_time = datetime.datetime.strptime(pre_atts.last().start_time.strftime(
+                        '%Y-%m-%d') + ' ' + worktime[0].end_time.strftime('%H:%M:%S'), '%Y-%m-%d %H:%M:%S')
+                    duration = round((end_time - pre_atts.last().start_time).seconds / 3600, 1)
+                    pre_atts.update(end_time=end_time, duration=duration, is_auto_signout=True)
+                    is_auto_signout = True
+                    sign_flag = True
                 else:
                     sign_flag = False
             except Signingin.DoesNotExist:

@@ -64,7 +64,11 @@
                     </thead>
                     <tbody>
                     {% for att in att_list %}
-                        <tr>
+                        <tr
+{#                                {% ifequal is_auto_signout True %}#}
+{#                                    style="color: #a50718;font-weight:bold"#}
+{#                                {% endifequal %}#}
+                        >
                             <td>{{ att.employee.emp_num }}</td>
                             <td>{{ att.employee.full_name }}</td>
                             <td>{{ att.start_time }}</td>
@@ -74,9 +78,7 @@
                             {% else %}
                                 <td>{{ att.start_time | timesince:att.end_time }}</td>
                             {% endifequal %}
-
                         </tr>
-
                     {% endfor %}
                     </tbody>
                 </table>
@@ -85,55 +87,25 @@
     </div>
     </div>
     {#巨幕结束#}
-    <!-- 两个动画 -->
-{#    <div class="row">#}
-{#        <div class="col-sm-4">#}
-{#            <object type="application/x-shockwave-flash" style="outline:none;"#}
-{#                    data="/static/flash/hamster.swf?up_bodyColor=f0e9cc&amp;up_feetColor=D4C898&amp;up_eyeColor=000567&amp;up_wheelSpokeColor=DEDEDE&amp;up_wheelColor=FFFFFF&amp;up_waterColor=E0EFFF&amp;up_earColor=b0c4de&amp;up_wheelOuterColor=FF4D4D&amp;up_snoutColor=F7F4E9&amp;up_bgColor=F0E4E4&amp;up_foodColor=cba920&amp;up_wheelCenterColor=E4EB2F&amp;up_tailColor=E6DEBE&amp;"#}
-{#                    width="200" height="160">#}
-{#                <param name="movie"#}
-{#                       value="/static/flash/hamster.swf?up_bodyColor=f0e9cc&amp;up_feetColor=D4C898&amp;up_eyeColor=000567&amp;up_wheelSpokeColor=DEDEDE&amp;up_wheelColor=FFFFFF&amp;up_waterColor=E0EFFF&amp;up_earColor=b0c4de&amp;up_wheelOuterColor=FF4D4D&amp;up_snoutColor=F7F4E9&amp;up_bgColor=F0E4E4&amp;up_foodColor=cba920&amp;up_wheelCenterColor=E4EB2E&amp;up_tailColor=E6DEBE&amp;">#}
-{#                <param name="AllowScriptAccess" value="always">#}
-{#                <param name="wmode" value="opaque">#}
-{#            </object>#}
-{#        </div>#}
-{#        <div class="col-sm-4">#}
-{#            <object type="application/x-shockwave-flash" style="outline:none;" data="http://cdn.abowman.com/widgets/fish/fish.swf?" width="300" height="200">#}
-{#                <param name="movie" value="http://cdn.abowman.com/widgets/fish/fish.swf?">#}
-{#                <param name="AllowScriptAccess" value="always">#}
-{#                <param name="wmode" value="opaque">#}
-{#                <param name="scale" value="noscale"/>#}
-{#                <param name="salign" value="tl"/>#}
-{#            </object>#}
-{#        </div>#}
-{#        <div class="col-sm-3 col-md-offset-5">#}
-{#            <object type="application/x-shockwave-flash" style="outline:none;"#}
-{#                    data="/static/flash/hamster.swf?up_bodyColor=000000&amp;up_feetColor=D4B898&amp;up_eyeColor=FFFFFF&amp;up_wheelSpokeColor=000000&amp;up_wheelColor=FFFFFF&amp;up_waterColor=66CDAA&amp;up_earColor=FFFFFF&amp;up_wheelOuterColor=000000&amp;up_snoutColor=FFFFFF&amp;up_bgColor=F5DEB3&amp;up_foodColor=000000&amp;up_wheelCenterColor=000000&amp;up_tailColor=FFFFFF&amp;"#}
-{#                    width="200" height="160">#}
-{#                <param name="movie"#}
-{#                       value="/static/flash/hamster.swf?up_bodyColor=f0e9cc&amp;up_feetColor=D4C898&amp;up_eyeColor=000567&amp;up_wheelSpokeColor=DEDEDE&amp;up_wheelColor=FFFFFF&amp;up_waterColor=E0EFFF&amp;up_earColor=b0c4de&amp;up_wheelOuterColor=FF4D4D&amp;up_snoutColor=F7F4E9&amp;up_bgColor=F0E4E4&amp;up_foodColor=cba920&amp;up_wheelCenterColor=E4EB2E&amp;up_tailColor=E6DEBE&amp;">#}
-{#                <param name="AllowScriptAccess" value="always">#}
-{#                <param name="wmode" value="opaque">#}
-{#            </object>#}
-{#        </div>#}
-{#    </div>#}
-
     <script>
-        // $('.panel-body').on('click', '#sign_btn', function () {
         $('.jumbotron').on('click', '#sign_btn', function () {
             $.post('/check/', {'sign':"{{ sign_flag }}"}, function (ret) {
                 // window.location.reload(true)
                 {% ifequal sign_flag True %}
-                    alert('签到成功！')
+                    alert('签到成功！');
                 {% else %}
-                    alert('签退成功！')
+                    alert('签退成功！');
                 {% endifequal %}
                 window.location.reload(true)
             })
-
-        })
+        });
+        $(document).ready(function(){
+                {% ifequal is_auto_signout True %}
+                    alert('存在未签退记录，系统已自动签退！');
+                {% endifequal %}
+        });
         $.ajaxSetup({
-            data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}'}
         });
     </script>
 
