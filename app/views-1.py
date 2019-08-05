@@ -80,7 +80,7 @@ def check(request):
             return render(request, 'edit_emp_info.html', locals())
         # print('emp:' + str(emp))
         cur_datetime = datetime.datetime.now()
-        test = False
+        test = True
         if test is True:
             cur_datetime = datetime.datetime(2019, 4, 8, 7, 10, 0)
 
@@ -183,7 +183,95 @@ def check(request):
                 if len(pre_atts) == 0:
                     sign_flag = True
                 else:
-                    sign_flag = False
+                    sign_flag = True
+                    print(len(pre_atts))
+                    print(cur_time)
+                    for pre_att in pre_atts:
+                        # print(pre_att.__dict__)
+                        # if (11:30, cur_datetime, 13:30] and [当天7:00, pre_att.start_time, 11:30]
+                        #   pre_att.eng_time = 11:30
+                        # [11:30, pre_att.start_time, 17:30] pre_att.eng_time = sign_day_cur_datetime <= 17:30
+                        # [17:30, pre_att.start_time, 第二天7:00] pre_att.eng_time = sign_day_cur_datetime <= 第二天7:00
+                        sign_day_worktime = {
+                            '上午': {'start_time': datetime.datetime.strptime(pre_att.start_time.strftime(
+                                '%Y-%m-%d') + ' ' + worktime[0].start_time.strftime('%H:%M:%S'), '%Y-%m-%d %H:%M:%S'),
+                                   'end_time': datetime.datetime.strptime(pre_att.start_time.strftime(
+                                       '%Y-%m-%d') + ' ' + worktime[0].end_time.strftime('%H:%M:%S'),
+                                                                          '%Y-%m-%d %H:%M:%S')},
+
+                            '下午': {'start_time': datetime.datetime.strptime(pre_att.start_time.strftime(
+                                '%Y-%m-%d') + ' ' + worktime[1].start_time.strftime('%H:%M:%S'), '%Y-%m-%d %H:%M:%S'),
+                                   'end_time': datetime.datetime.strptime(pre_att.start_time.strftime('%Y-%m-%d') + ' '
+                                                                          + worktime[1].end_time.strftime('%H:%M:%S'),
+                                                                          '%Y-%m-%d %H:%M:%S')}}
+                        next_day_7 = datetime.datetime.strptime((pre_att.start_time + datetime.timedelta(days=1)).strftime('%Y-%m-%d'), '%Y-%m-%d') + datetime.timedelta(hours=7)
+                        if cur_datetime > next_day_7:
+                            if pre_att.start_time > (sign_day_worktime['上午']['start_time'] + datetime.timedelta(hours=-1)) \
+                                    and pre_att.start_time <= sign_day_worktime['上午']['end_time']:
+                                end_time = sign_day_worktime['上午']['end_time']
+                            elif pre_att.start_time > sign_day_worktime['上午']['start_time'] \
+                                    and pre_att.start_time <= sign_day_worktime['下午']['end_time']:
+                                end_time = sign_day_worktime['下午']['end_time']
+                            else:
+                                end_time = next_day_7
+                        elif pre_att.start_time > (sign_day_worktime['上午']['start_time'] + datetime.timedelta(hours=-1)) \
+                            and pre_att.start_time <= sign_day_worktime['上午']['end_time']:
+                            if cur_datetime <= sign_day_worktime['上午']['end_time']:
+                                end_time = cur_datetime
+                            else:
+                                end_time = sign_day_worktime['上午']['end_time']
+                        elif pre_att.start_time > sign_day_worktime['下午']['end_time'] \
+                                 and pre_att.start_time <= sign_day_worktime['下午']['end_time']:
+                            if cur_datetime <= sign_day_worktime['下午']['end_time']:
+                                end_time = cur_datetime
+                            else:
+                                end_time = sign_day_worktime['下午']['end_time']
+                        elif pre_att.start_time > sign_day_worktime['上午']['end_time'] \
+                                 and pre_att.start_time <= next_day_7:
+                            if cur_datetime <= next_day_7:
+                                end_time = cur_datetime
+                            else:
+                                end_time = next_day_7
+                        else:
+                            sign_flag = False
+                        duration = round((end_time - pre_att.start_time).seconds / 3600, 1)
+                        pre_atts.update(end_time=end_time, duration=duration, is_auto_signout=True)
+                        is_auto_signout = True
+                        sign_flag = True
+
+
+                        # sign_day_cur_datetime = datetime.datetime.strptime(pre_att.start_time.strftime('%Y-%m-%d') +
+                        #                     ' ' + cur_time.strftime('%H:%M:%S'), '%Y-%m-%d %H:%M:%S')
+                        # sign_day_cur_datetime = cur_datetime
+                        # print(sign_day_worktime)
+                        # print(sign_day_cur_datetime)
+                        # if sign_day_cur_datetime > sign_day_worktime['下午']['end_time'] and pre_att.start_time < \
+                        #         sign_day_worktime['下午']['end_time']:
+                        #     end_time = sign_day_worktime['下午']['end_time']
+                        #     duration = round((end_time - pre_att.start_time).seconds / 3600, 1)
+                        #     pre_atts.update(end_time=end_time, duration=duration, is_auto_signout=True)
+                        #     is_auto_signout = True
+                        #     sign_flag = True
+                        # elif sign_day_cur_datetime > sign_day_worktime['上午']['end_time'] and sign_day_cur_datetime < \
+                        #         sign_day_worktime['下午']['start_time'] and \
+                        #         pre_att.start_time < sign_day_worktime['上午']['end_time']:
+                        #     end_time = sign_day_worktime['上午']['end_time']
+                        #     duration = round((end_time - pre_att.start_time).seconds / 3600, 1)
+                        #     pre_atts.update(end_time=end_time, duration=duration, is_auto_signout=True)
+                        #     # print(worktime[0].end_time)
+                        #     # print(end_time)
+                        #     # print(pre_att.start_time.time())
+                        #     is_auto_signout = True
+                        #     sign_flag = True
+                        # elif pre_att.start_time < sign_day_worktime['上午']['start_time']:
+                        #     end_time = datetime.datetime.strptime(pre_att.start_time.strftime('%Y-%m-%d') +
+                        #                                           ' 07:00:00', '%Y-%m-%d %H:%M:%S')
+                        #     duration = round((end_time - pre_att.start_time).seconds / 3600, 1)
+                        #     pre_atts.update(end_time=end_time, duration=duration, is_auto_signout=True)
+                        #     is_auto_signout = True
+                        #     sign_flag = True
+                        # else:
+                        #     sign_flag = False
 
             att_list = Signingin.objects.filter(start_time__gt=(cur_date + datetime.timedelta(days=-10)),
                                                 employee=emp).order_by('-id')
