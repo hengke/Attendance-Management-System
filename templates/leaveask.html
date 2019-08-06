@@ -6,7 +6,7 @@
     <script type="text/javascript" src="/static/js/bootstrap-datetimepicker.js"></script>
     <script type="text/javascript" src="/static/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
 
-    <div class="jumbotron">
+    <div class="jumbotron col-sm-8">
         <div class="panel panel-primary">
             <div class="panel-heading">
                 <h2 class="panel-title">请假申请</h2>
@@ -16,8 +16,8 @@
                     <fieldset>
                     {% csrf_token %}
                     <div class="form-group">
-                        <label for="leaveType" class="col-sm-3 control-label">假别：</label>
-                        <div class='col-sm-3'>
+                        <label for="leaveType" class="col-sm-4 control-label">假别：</label>
+                        <div class='col-sm-4'>
                             <select class="form-control" id="leaveType" name="leaveType" onchange="checkField(this.value)">
                                 {% for leave_type in leave_type_list %}
                                         <option value="{{ leave_type.name }}">{{ leave_type.name }}</option>
@@ -26,40 +26,40 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="dtp_input1" class="col-sm-3 control-label">开始日期：</label>
-                        <div class="input-group date form_start_date col-sm-3" data-link-field="dtp_input1" data-link-format="yyyy-mm-dd">
+                        <label for="dtp_input1" class="col-sm-4 control-label">开始日期：</label>
+                        <div class="input-group date form_start_date col-sm-4" data-link-field="dtp_input1" data-link-format="yyyy-mm-dd">
                             <input class="form-control" size="16" type="text" name="startdate" value="" readonly>
                             <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
                             <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
                         </div>
                     </div>
                     <div class="form-group" id="div_start_time" style="display:none">
-                        <label for="dtp_input2" class="col-sm-3 control-label">开始时间：</label>
-                        <div class="input-group date form_start_time col-sm-3" data-link-field="dtp_input2" data-link-format="hh:ii">
+                        <label for="dtp_input2" class="col-sm-4 control-label">开始时间：</label>
+                        <div class="input-group date form_start_time col-sm-4" data-link-field="dtp_input2" data-link-format="hh:ii">
                             <input class="form-control" size="16" type="text" name="starttime" value="" readonly>
                             <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
                             <span class="input-group-addon"><span class="glyphicon glyphicon-time"></span></span>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="dtp_input3" class="col-sm-3 control-label">结束日期：</label>
-                        <div class="input-group date form_end_date col-sm-3" data-link-field="dtp_input3" data-link-format="yyyy-mm-dd">
+                        <label for="dtp_input3" class="col-sm-4 control-label">结束日期：</label>
+                        <div class="input-group date form_end_date col-sm-4" data-link-field="dtp_input3" data-link-format="yyyy-mm-dd">
                             <input class="form-control" size="16" type="text" name="enddate" value="" readonly>
                             <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
                             <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
                         </div>
                     </div>
                     <div class="form-group"  id="div_end_time" style="display:none">
-                        <label for="dtp_input4" class="col-sm-3 control-label">结束时间：</label>
-                        <div class="input-group date form_end_time col-sm-3" data-link-field="dtp_input4" data-link-format="hh:ii">
+                        <label for="dtp_input4" class="col-sm-4 control-label">结束时间：</label>
+                        <div class="input-group date form_end_time col-sm-4" data-link-field="dtp_input4" data-link-format="hh:ii">
                             <input class="form-control" size="16" type="text" name="endtime" value="" readonly>
                             <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
                             <span class="input-group-addon"><span class="glyphicon glyphicon-time"></span></span>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="destination" class="col-sm-3 control-label">目的地：</label>
-                        <div class="col-sm-3">
+                        <label for="destination" class="col-sm-4 control-label">目的地：</label>
+                        <div class="col-sm-4">
                             <input class="form-control" size="16" type="text" value="" name="destination" id="destination" readonly>
                         </div>
                     </div>
@@ -81,13 +81,13 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="inputContent" class="col-sm-3 control-label">请假原因：</label>
-                        <div class="col-sm-3">
+                        <label for="inputContent" class="col-sm-4 control-label">请假原因：</label>
+                        <div class="col-sm-4">
                             <textarea rows="3" name="reason" class="form-control" id="inputContent"></textarea>
                         </div>
                     </div>
                     <div class="form-group">
-                        <div class="col-sm-offset-4 col-sm-3">
+                        <div class="col-sm-offset-4 col-sm-4">
                             <input type="submit" class="btn btn-success" style="height:50px;width:140px;cursor:pointer;font-size:20px;display:inline-block;" value="提交申请"></input>
                         </div>
                     </div>

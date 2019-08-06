@@ -72,21 +72,27 @@ def check(request):
     (flag, rank) = check_cookie(request)
 
     if flag:  # flag为True时，rank为user
-        user = rank
+
         try:
-            emp = Employee.objects.get(user=user)
+            emp = Employee.objects.get(user=rank)
         except Employee.DoesNotExist:
             emp = None
             return render(request, 'edit_emp_info.html', locals())
-        # print('emp:' + str(emp))
+
         cur_datetime = datetime.datetime.now()
-        test = False
-        if test is True:
-            cur_datetime = datetime.datetime(2019, 4, 8, 7, 10, 0)
+        # 推迟签到，提前签退时间10分钟
+        h = cur_datetime.hour
+        m = cur_datetime.minute
+        if (h == 8 and m <= 10) or (h == 13 and (30 <= m or m <= 40)):
+            cur_datetime = cur_datetime + datetime.timedelta(minutes=-10)
+        if (h == 11 and (20 <= m or m <= 30)) or (h == 17 and (30 <= m or m <= 40)):
+            cur_datetime = cur_datetime + datetime.timedelta(minutes=10)
+        # test = False
+        # if test is True:
+        #     cur_datetime = datetime.datetime(2019, 4, 8, 7, 10, 0)
 
         cur_date = cur_datetime.date()
         cur_time = cur_datetime.time()
-        # test = False
 
         try:
             cur_day = EveryDayArrangements.objects.get(date=cur_date)

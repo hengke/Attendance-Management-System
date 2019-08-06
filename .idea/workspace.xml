@@ -2,12 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cf60e3c3-4e8d-44b1-882c-5eb797c494b1" name="Default" comment="根据节假日安排表生成EveryDayArrangements表（一年中每天是否工作日、节假日、法定节假日、调休等）">
-      <change afterPath="$PROJECT_DIR$/app/auto_signout.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/views-1.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/auto_signout.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/auto_signout.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/check.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/check.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/leaveask.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/leaveask.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/leavequery.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/leavequery.html" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -275,17 +277,7 @@
     <option name="allServicesViewState">
       <serviceView>
         <treeState>
-          <expand>
-            <path>
-              <item name="services root" type="e789fda9:ObjectUtils$Sentinel" />
-              <item name="com.intellij.execution.services.ServiceModel$ServiceGroupNode@6845dfe8" type="7427dc5b:ServiceModel$ServiceGroupNode" />
-            </path>
-            <path>
-              <item name="services root" type="e789fda9:ObjectUtils$Sentinel" />
-              <item name="com.intellij.execution.services.ServiceModel$ServiceGroupNode@6845dfe8" type="7427dc5b:ServiceModel$ServiceGroupNode" />
-              <item name="com.intellij.execution.services.ServiceModel$ServiceNode@8ca3617" type="9fbbdea:ServiceModel$ServiceNode" />
-            </path>
-          </expand>
+          <expand />
           <select />
         </treeState>
       </serviceView>
@@ -328,6 +320,7 @@
       <workItem from="1564911783563" duration="10495000" />
       <workItem from="1564964609725" duration="24078000" />
       <workItem from="1565000033599" duration="10424000" />
+      <workItem from="1565050522858" duration="15542000" />
     </task>
     <task id="LOCAL-00001" summary="专业添加及删除">
       <created>1522326851997</created>
@@ -499,7 +492,7 @@
     <option name="LAST_COMMIT_MESSAGE" value="增加自动签退功能" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Attendance_Management_System$auto_signout.coverage" NAME="auto_signout Coverage Results" MODIFIED="1565015413134" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app" />
+    <SUITE FILE_PATH="coverage/Attendance_Management_System$auto_signout.coverage" NAME="auto_signout Coverage Results" MODIFIED="1565059511270" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app" />
     <SUITE FILE_PATH="coverage/Attendance_Management_System$loaddata.coverage" NAME="loaddata Coverage Results" MODIFIED="1564887742702" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app" />
     <SUITE FILE_PATH="coverage/Attendance_Management_System$.coverage" NAME="爬虫 Coverage Results" MODIFIED="1564452003660" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
