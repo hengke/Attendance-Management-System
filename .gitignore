@@ -36,6 +36,7 @@ MANIFEST
 *.manifest
 *.spec
 .idea/
+.idea/workspace.xml
 .vscode/
 
 # Installer logs

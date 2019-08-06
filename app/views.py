@@ -80,7 +80,7 @@ def check(request):
             return render(request, 'edit_emp_info.html', locals())
 
         cur_datetime = datetime.datetime.now()
-        # 推迟签到，提前签退时间10分钟
+        # 推迟签到，提前签退时间各10分钟
         h = cur_datetime.hour
         m = cur_datetime.minute
         if (h == 8 and m <= 10) or (h == 13 and (30 <= m or m <= 40)):
@@ -106,7 +106,6 @@ def check(request):
         except EveryDayArrangements.DoesNotExist:
             return render(request, 'page-login.html', {'error_msg': "WorkTime: Cann't find " + '普通'})
 
-        # tdelta = datetime.timedelta(days=12)
         # print('cur_time:' + str(cur_time))
         # 判断是否是工作时间内，
         if cur_day.is_workday:
@@ -131,32 +130,12 @@ def check(request):
                 is_in_leaving = True
 
         # print('is_in_leaving:' + str(is_in_leaving))
-        #
-        # if workday and worktime:
-        #     if not is_in_leaving:
-        #         签到
-        #     else:
-        #         提示正在休假中，显示当前休假详情
-        #         询问是否加班，还是提前销假
-        #         加班：
-        #             签到，并创建加班记录，填写加班内容，备注休假中途加班
-        #         提前销假：
-        #             跳转到销假页面
-        # else if is_legal_holidays:
-        #     签到，并创建加班记录，填写加班内容，备注节日加班
-        # else:
-        #     签到，并创建加班记录，填写加班内容，备注普通加班
 
         if request.method == 'POST':
             sign_flag = request.POST.get('sign')
-            # print('check:sign_flag', type(sign_flag), sign_flag)
             if sign_flag == 'True':  # 签到，创建记录
-                # start_time = datetime.datetime(2019, 8, 5, 14, 45, 0)
-                # Signingin.objects.create(employee=emp, start_time=start_time)
                 sign = Signingin(employee=emp, start_time=cur_datetime)
                 # print(sign.__dict__)
-
-                # sign.save()
                 if is_in_leaving:
                     sign.is_holiday = True
                     sign.remarks = '休假中加班'
@@ -177,10 +156,11 @@ def check(request):
                 if is_worktime:
                     is_left_early = True
                 cur_attendent = Signingin.objects.filter(employee=emp, end_time=None)
+                # 计算时长
                 duration = round((cur_datetime - cur_attendent.last().start_time).seconds / 3600, 1)
                 cur_attendent.update(end_time=cur_datetime, duration=duration, is_left_early=is_left_early)
             return HttpResponse(request, '操作成功')
-        else:
+        else:  # 非POST请求，查询是否有未签退记录，有显示签退
             try:
                 pre_atts = Signingin.objects.filter(employee=emp, end_time=None)
             except Signingin.DoesNotExist:
@@ -190,7 +170,6 @@ def check(request):
                     sign_flag = True
                 else:
                     sign_flag = False
-
             att_list = Signingin.objects.filter(start_time__gt=(cur_date + datetime.timedelta(days=-10)),
                                                 employee=emp).order_by('-id')
             return render(request, 'check.html', locals())
