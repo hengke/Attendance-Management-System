@@ -178,108 +178,137 @@ def check(request):
 
 
 # 编辑员工信息
+@is_login
 def edit_emp_info(request):
     (flag, rank) = check_cookie(request)
     # print('check：flag', flag)
     # print('check：rank', rank)
     user = rank
-    emp = Employee.objects.get(user=user)
-    # 所有用户类型列表
-    user_type_list = UserType.objects.all()
-    # 所有的部门
-    dept_list = Department.objects.all()
+    if flag:
+        emp = Employee.objects.get(user=user)
+        # 所有用户类型列表
+        user_type_list = UserType.objects.all()
+        # 所有的部门
+        dept_list = Department.objects.all()
 
-    if request.method == 'POST':
-        department = Department.objects.get(name=request.POST.get('department'))
-        user_type = UserType.objects.get(caption=request.POST.get('user_type'))
-        full_name = request.POST.get('full_name')
-        gender = request.POST.get('gender')
-        birth_date = request.POST.get('birth_date')
-        work_phone = request.POST.get('work_phone')
-        cell_phone = request.POST.get('cell_phone')
-        email = request.POST.get('email')
+        if request.method == 'POST':
+            department = Department.objects.get(name=request.POST.get('department'))
+            user_type = UserType.objects.get(caption=request.POST.get('user_type'))
+            full_name = request.POST.get('full_name')
+            gender = request.POST.get('gender')
+            birth_date = request.POST.get('birth_date')
+            work_phone = request.POST.get('work_phone')
+            cell_phone = request.POST.get('cell_phone')
+            email = request.POST.get('email')
 
-        user.email = email
-        emp.full_name = full_name
-        emp.department = department
-        emp.user_type = user_type
-        emp.gender = gender
-        emp.birth_date = birth_date
-        emp.work_phone = work_phone
-        emp.cell_phone = cell_phone
+            user.email = email
+            emp.full_name = full_name
+            emp.department = department
+            emp.user_type = user_type
+            emp.gender = gender
+            emp.birth_date = birth_date
+            emp.work_phone = work_phone
+            emp.cell_phone = cell_phone
 
-        user.save()
-        emp.save()
-        return render(request, 'show_emp_info.html', locals())
+            user.save()
+            emp.save()
+            # return render(request, 'show_emp_info.html', locals())
 
-    return render(request, 'edit_emp_info.html', locals())
+        return render(request, 'edit_emp_info.html', locals())
+    else:
+        return render(request, 'page-login.html', {'error_msg': '您未登录，请登录！'})
+
+
+# 编辑加班原因
+def edit_sign_reason(request):
+    (flag, rank) = check_cookie(request)
+    if flag:
+        if request.method == 'POST':
+            sign_id = request.POST.get('sign_id')
+            worktime_reason = request.POST.get('worktime-reason')
+            print(sign_id)
+            print(worktime_reason)
+            sign = Signingin.objects.get(id=sign_id)
+            sign.reason = worktime_reason
+            sign.save()
+            reason_save_flag = True
+            return render(request, 'check.html', locals())
+        return render(request, 'check.html', locals())
+    else:
+        return render(request, 'page-login.html', {'error_msg': '您未登录，请登录！'})
 
 
 # 请假申请
 @is_login
 def leave_ask(request):
-    (flag, user) = check_cookie(request)
+    (flag, rank) = check_cookie(request)
     # user = User.objects.get(username=username)
-    emp = Employee.objects.get(user=user)
-    leave_list = Leave.objects.filter(employee=emp)
-    leave_type_list = LeaveType.objects.all()
+    if flag:
+        emp = Employee.objects.get(user=rank)
+        leave_list = Leave.objects.filter(employee=emp)
+        leave_type_list = LeaveType.objects.all()
 
-    if request.method == 'POST':
-        leavetype = request.POST.get('leaveType')
-        leave_type = LeaveType.objects.get(name=leavetype)
-        startdate = request.POST.get('startdate')
-        starttime = request.POST.get('starttime')
-        endtime = request.POST.get('endtime')
-        enddate = request.POST.get('enddate')
-        destination = request.POST.get('destination')
-        reason = request.POST.get('reason')
-        if startdate == '':
-            startdate = datetime.datetime.now().strftime('%Y-%m-%d')
+        if request.method == 'POST':
+            leavetype = request.POST.get('leaveType')
+            leave_type = LeaveType.objects.get(name=leavetype)
+            startdate = request.POST.get('startdate')
+            starttime = request.POST.get('starttime')
+            endtime = request.POST.get('endtime')
+            enddate = request.POST.get('enddate')
+            destination = request.POST.get('destination')
+            reason = request.POST.get('reason')
+            if startdate == '':
+                startdate = datetime.datetime.now().strftime('%Y-%m-%d')
 
-        if enddate == '':
-            enddate = startdate
+            if enddate == '':
+                enddate = startdate
 
-        if starttime == '':
-            starttime = '00:00:00'
-        else:
-            starttime = starttime + ':00'
+            if starttime == '':
+                starttime = '00:00:00'
+            else:
+                starttime = starttime + ':00'
 
-        if endtime == '':
-            endtime = '00:00:00'
-        else:
-            endtime = endtime + ':00'
-        str11 = startdate + ' ' + starttime
-        str22 = enddate + ' ' + endtime
-        startdatetime = datetime.datetime.strptime(str11, '%Y-%m-%d %H:%M:%S')
-        enddatetime = datetime.datetime.strptime(str22, '%Y-%m-%d %H:%M:%S')
-        ask_time = datetime.datetime.now()
-        leave_id = datetime.datetime.now().strftime('%Y%m%d%s%f')
-        approval_id = datetime.datetime.now().strftime('%Y%m%d%s%f')
+            if endtime == '':
+                endtime = '00:00:00'
+            else:
+                endtime = endtime + ':00'
+            str11 = startdate + ' ' + starttime
+            str22 = enddate + ' ' + endtime
+            startdatetime = datetime.datetime.strptime(str11, '%Y-%m-%d %H:%M:%S')
+            enddatetime = datetime.datetime.strptime(str22, '%Y-%m-%d %H:%M:%S')
+            ask_time = datetime.datetime.now()
+            leave_id = datetime.datetime.now().strftime('%Y%m%d%s%f')
+            approval_id = datetime.datetime.now().strftime('%Y%m%d%s%f')
 
-        Leave.objects.create(employee=emp, leave_id=leave_id, leave_type=leave_type, ask_time=ask_time,
-                             start_time=startdatetime, end_time=enddatetime, reason=reason, destination=destination,
-                             approval_id=approval_id)
-        return render(request, 'leavequery.html', locals())
+            Leave.objects.create(employee=emp, leave_id=leave_id, leave_type=leave_type, ask_time=ask_time,
+                                 start_time=startdatetime, end_time=enddatetime, reason=reason, destination=destination,
+                                 approval_id=approval_id)
+            # return render(request, 'leavequery.html', locals())
 
-    return render(request, 'leaveask.html', locals())
+        return render(request, 'leaveask.html', locals())
+    else:
+        return render(request, 'page-login.html', {'error_msg': '您未登录，请登录！'})
 
 
 # 请假查询
 @is_login
 def leave_query(request):
-    (flag, user) = check_cookie(request)
-    emp = Employee.objects.get(user=user)
+    (flag, rank) = check_cookie(request)
+    if flag:
+        emp = Employee.objects.get(user=rank)
 
-    if request.method == 'POST':
-        leave_id = request.POST.get('leave_id')
-        print('leave_report_back:leave_id:leave_id', leave_id)
-        leave = Leave.objects.get(employee=emp, leave_id=leave_id)
-        leave.report_back_time = datetime.datetime.now()
-        leave.save()
-        return render(request, 'leave_report_back_success.html', locals())
+        if request.method == 'POST':
+            leave_id = request.POST.get('leave_id')
+            print('leave_report_back:leave_id:leave_id', leave_id)
+            leave = Leave.objects.get(employee=emp, leave_id=leave_id)
+            leave.report_back_time = datetime.datetime.now()
+            leave.save()
+            return render(request, 'leave_report_back_success.html', locals())
 
-    leave_list = Leave.objects.filter(employee=emp)
-    return render(request, 'leavequery.html', locals())
+        leave_list = Leave.objects.filter(employee=emp)
+        return render(request, 'leavequery.html', locals())
+    else:
+        return render(request, 'page-login.html', {'error_msg': '您未登录，请登录！'})
 
 
 # 假别设置
@@ -347,41 +376,41 @@ def total(request):
     firstDay = nowdate - datetime.timedelta(days=weekDay)
     lastDay = nowdate + datetime.timedelta(days=6 - weekDay)
 
-    # if flag:
-    if request.method == 'POST':
-        # print(firstDay,lastDay)
-        # info_list=Signingin.objects.filter(date__gte=firstDay,date__lte=lastDay) \
-        #   .values('employee','emp__username','emp__cid__name') \
-        #   .annotate(total_time=Sum('duration'),leave_count=Sum('is_leave')).order_by()
+    if flag:
+        if request.method == 'POST':
+            # print(firstDay,lastDay)
+            # info_list=Signingin.objects.filter(date__gte=firstDay,date__lte=lastDay) \
+            #   .values('employee','emp__username','emp__cid__name') \
+            #   .annotate(total_time=Sum('duration'),leave_count=Sum('is_leave')).order_by()
 
-        info_list = Signingin.objects.filter(date__gte=firstDay, date__lte=lastDay) \
-            .values('employee', 'emp__username', 'emp__cid__name', 'leave_count') \
-            .annotate(total_time=Sum('duration')).order_by()
-        info_list = json.dumps(list(info_list), cls=DecimalEncoder)
+            info_list = Signingin.objects.filter(date__gte=firstDay, date__lte=lastDay) \
+                .values('employee', 'emp__username', 'emp__cid__name', 'leave_count') \
+                .annotate(total_time=Sum('duration')).order_by()
+            info_list = json.dumps(list(info_list), cls=DecimalEncoder)
 
-        return HttpResponse(info_list)
+            return HttpResponse(info_list)
+        else:
+            # print(firstDay,lastDay)
+            leave_list = Leave.objects.filter().values('user', 'start_time', 'end_time')
+            # print(leave_list)
+            info_list = Signingin.objects.filter(date__gte=firstDay, date__lte=lastDay) \
+                .values('employee', 'emp__username', 'emp__cid__name', 'leave_count') \
+                .annotate(total_time=Sum('duration')).order_by()
+
+            # info_list=Signingin.objects.filter(date__gte=firstDay,date__lte=lastDay).values('employee','emp__username','emp__cid__name')\
+            #     .annotate(total_time=Sum('duration'),leave_count=Sum('is_leave'))\
+            #     .extra(
+            #     select={'starttime':"select start_time from app_leave where %s BETWEEN start_time AND end_time"},
+            #     select_params=[nowdate]
+            # )\
+            #     .order_by()
+
+            # info_list=json.dumps(list(info_list),cls=DecimalEncoder)
+            print(info_list)
+
+            return render(request, 'total.html', locals())
     else:
-        # print(firstDay,lastDay)
-        leave_list = Leave.objects.filter().values('user', 'start_time', 'end_time')
-        # print(leave_list)
-        info_list = Signingin.objects.filter(date__gte=firstDay, date__lte=lastDay) \
-            .values('employee', 'emp__username', 'emp__cid__name', 'leave_count') \
-            .annotate(total_time=Sum('duration')).order_by()
-
-        # info_list=Signingin.objects.filter(date__gte=firstDay,date__lte=lastDay).values('employee','emp__username','emp__cid__name')\
-        #     .annotate(total_time=Sum('duration'),leave_count=Sum('is_leave'))\
-        #     .extra(
-        #     select={'starttime':"select start_time from app_leave where %s BETWEEN start_time AND end_time"},
-        #     select_params=[nowdate]
-        # )\
-        #     .order_by()
-
-        # info_list=json.dumps(list(info_list),cls=DecimalEncoder)
-        print(info_list)
-
-        return render(request, 'total.html', locals())
-    # else:
-    #     return render(request, 'page-login.html', {'error_msg': ''})
+        return render(request, 'page-login.html', {'error_msg': ''})
 
 # # 部门管理
 # def department_manage(request):

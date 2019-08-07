@@ -24,7 +24,7 @@ var current_region = {
 
 /*自动加载省份列表*/
 (function showProv() {
-    but.disabled = true;
+    //but.disabled = true;
     var len = provice.length;
     for (var i = 0; i < len; i++) {
         var provOpt = document.createElement('option');
@@ -40,11 +40,12 @@ function showCity(obj) {
     if (val !== current_region.prov) {
         current_region.prov = val;
         addrShow.value = '';
-        but.disabled = true;
+        //but.disabled = true;
     }
     //console.log(val);
     if (val != null) {
         city.length = 1;
+        country.length = 1;
         var cityLen = provice[val]["city"].length;
         for (var j = 0; j < cityLen; j++) {
             var cityOpt = document.createElement('option');
@@ -79,8 +80,9 @@ function showCountry(obj) {
 function selecCountry(obj) {
     current_region.country = obj.options[obj.selectedIndex].value;
     if ((current_region.city != null) && (current_region.country != null)) {
-        but.disabled = false;
+        //but.disabled = false;
     }
+    showAddr()
 }
 
 /*点击确定按钮显示用户所选的地址*/

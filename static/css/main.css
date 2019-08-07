@@ -676,14 +676,12 @@ fieldset[disabled] .btn {
   .panel .table > tfoot > tr > td:first-child,
   .panel .table > tfoot > tr > th:first-child {
     padding-left: 25px; }
-  .panel .table > thead > tr > td:last-child,
-  .panel .table > thead > tr > th:last-child,
-  .panel .table > tbody > tr > td:last-child,
-  .panel .table > tbody > tr > th:last-child,
-  .panel .table > tfoot > tr > td:last-child,
-  .panel .table > tfoot > tr > th:last-child {
-    padding-left: 25px; }
-
+  .table-primary {
+    font-size: 18px;
+  }
+  .tr {
+    font-size: 28px;
+  }
 .panel-footer {
   background-color: #fafafa; }
 
@@ -1170,7 +1168,7 @@ ul.activity-list > li {
   .profile-header .profile-main {
     position: relative;
     padding: 20px;
-    background-image: url("../../assets/img/profile-bg.png");
+    /*background-image: url("../../assets/img/profile-bg.png");*/
     background-repeat: no-repeat;
     background-size: cover; }
   .profile-header .name {
