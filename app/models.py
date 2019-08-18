@@ -17,7 +17,7 @@ class WorkTime(models.Model):
         return self.name
 
     def is_worktime(self, time):
-        if time >= self.start_time and time <= self.end_time:
+        if self.start_time <= time <= self.end_time:
             return True
         else:
             return False
@@ -142,28 +142,22 @@ class Leave(models.Model):
 
 
 # 考勤记录表
+# 根据签到表、请假表，生成每个员工每天上午、下午的考勤记录，有晚上加班的生成夜班记录
 class Attendance(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, verbose_name='员工')
-    date = models.DateField(default=timezone.now, verbose_name='日期')
-    shift = models.ForeignKey(WorkTime, on_delete=models.CASCADE, verbose_name='班次')
-    state = models.TextField(default="出勤", max_length=20, blank=False, verbose_name='考勤状态')
-    is_night_work_overtime = models.BooleanField(default=False, verbose_name='是否夜加班')
-    is_work_overtime = models.BooleanField(default=False, verbose_name='是否加班')
-    is_legal_holiday = models.BooleanField(default=False, verbose_name='是否法定节假日加班')
-    is_leave = models.BooleanField(default=False, verbose_name='是否休假')
+    date = models.DateField(verbose_name='日期')
+    shift = models.CharField(max_length=20, verbose_name='班次')  # 上午、下午、晚上
+    state = models.CharField(default="出勤", max_length=20, blank=False, verbose_name='考勤状态')
+    is_attendance = models.BooleanField(default=False, verbose_name='是否正常出勤')
+    is_come_late = models.BooleanField(default=False, verbose_name='是否迟到')
+    is_left_early = models.BooleanField(default=False, verbose_name='是否早退')
+    is_absenteeism = models.BooleanField(default=False, verbose_name='是否旷工')
+    is_night_work_overtime = models.BooleanField(default=False, verbose_name='是否加夜班')
+    is_holiday_work_overtime = models.BooleanField(default=False, verbose_name='是否加班')
+    is_legal_holiday_work_overtime = models.BooleanField(default=False, verbose_name='是否节日加班')
+    is_leave = models.BooleanField(default=False, verbose_name='是否请假')
     remarks = models.TextField(default='', verbose_name='备注')
-    # 出勤
-    # 加班：夜班，加班，节日加班
-    # 请假：
-    # 迟到
-    # 早退
-    # 旷工
     # 补签，补签同意
-    # cur_time = models.DateTimeField(auto_now_add=True)
-    # start_time = models.DateTimeField(null=True, blank=True)
-    # end_time = models.DateTimeField(null=True, blank=True)
-    # duration = models.DecimalField(max_digits=5, decimal_places=2, default=0)
-    # leave_count = models.IntegerField(default=0, verbose_name='请假天数')
 
     def __str__(self):
         return self.employee.user.username
@@ -175,7 +169,7 @@ class Signingin(models.Model):
     start_time = models.DateTimeField(null=True, blank=True, verbose_name='签到时间')
     end_time = models.DateTimeField(null=True, blank=True, verbose_name='签退时间')
     duration = models.DecimalField(max_digits=5, decimal_places=2, default=0, verbose_name='时长')
-    is_auto_signout =  models.BooleanField(default=False, verbose_name='是否系统自动签退')
+    is_auto_signout = models.BooleanField(default=False, verbose_name='是否系统自动签退')
     is_come_late = models.BooleanField(default=False, verbose_name='是否迟到')
     is_left_early = models.BooleanField(default=False, verbose_name='是否早退')
     is_legal_holiday = models.BooleanField(default=False, verbose_name='是否节日加班')
@@ -186,17 +180,6 @@ class Signingin(models.Model):
 
     def __str__(self):
         return self.employee.user.username
-
-
-# 加班记录表
-# class WorkOvertime(models.Model):
-#     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-#     start_time = models.DateTimeField(null=True, blank=True, verbose_name='签到时间')
-#     end_time = models.DateTimeField(null=True, blank=True, verbose_name='签退时间')
-#     is_legal_holiday = models.BooleanField(default=False, verbose_name='是否节日加班')
-#     is_holiday = models.BooleanField(default=False, verbose_name='是否加班')
-#     is_night = models.BooleanField(default=False, verbose_name='是否夜班')
-#     duration = models.DecimalField(max_digits=5, decimal_places=2, default=0, verbose_name='时长')
 
 
 # 公告表设计
