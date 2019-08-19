@@ -969,7 +969,7 @@ ul.activity-list > li {
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
   border-radius: 5px;
-  width: 70%;
+  width: 600px;
   height: 450px;
   margin: 0 auto;
   background-color: #fff; }
@@ -992,7 +992,7 @@ ul.activity-list > li {
     vertical-align: middle; }
   .auth-box .left {
     float: left;
-    width: 42%;
+    width: 95%;
     height: 100%;
     padding: 0 30px;
     text-align: center; }
@@ -1007,7 +1007,7 @@ ul.activity-list > li {
       height: 100%; }
   .auth-box .right {
     float: right;
-    width: 58%;
+    width: 50%;
     height: 100%;
     position: relative;
     background-image: url("/static/img/login-bg.jpg");
@@ -1024,8 +1024,8 @@ ul.activity-list > li {
       height: 100%; }
     .auth-box .right .text {
       position: relative;
-      padding: 0 30px;
-      color: #fff; }
+      padding: 90px 30px;
+      color: #ff1119; }
     .auth-box .right .heading {
       margin-top: 0;
       margin-bottom: 5px;
@@ -1051,9 +1051,11 @@ ul.activity-list > li {
   .auth-box .form-auth-small .btn {
     margin-top: 20px; }
   .auth-box .form-auth-small .element-left {
-    float: left; }
+    float: left;
+    font-size: 16px;}
   .auth-box .form-auth-small .element-right {
-    float: right; }
+    float: right;
+    font-size: 16px;}
   .auth-box .form-auth-small .bottom {
     margin-top: 20px;
     text-align: center; }

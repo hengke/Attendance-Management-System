@@ -27,7 +27,7 @@ import datetime
 
 # 首页
 def index(request):
-    return redirect('/check/')
+    return redirect('/login/')
     # (flag, rank) = check_cookie(request)
     # print('flag', flag)
     #
@@ -53,7 +53,7 @@ def login(request):
                 except Employee.DoesNotExist:
                     return render(request, 'edit_emp_info.html', locals())
                 else:
-                    response = redirect('/index/')
+                    response = redirect('/check/')
                     response.set_cookie('qwer', username, 3600)
                     response.set_cookie('asdf', password, 3600)
                     return response
@@ -64,7 +64,7 @@ def login(request):
     else:
         (flag, rank) = check_cookie(request)
         if flag:
-            return redirect('/index/')
+            return redirect('/check/')
         return render(request, 'page-login.html', {'error_msg': ''})
 
 

@@ -25,7 +25,9 @@ tbody {
 .table-primary {
   font-size: 20px;
 }
-
+th {
+  text-align: center;
+}
 form {
   font-size: 17px;
 }
