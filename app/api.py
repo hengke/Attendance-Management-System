@@ -1,4 +1,4 @@
-from .models import Employee, Department, UserType
+from .models import Employee, Structure, UserType
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from functools import wraps
@@ -64,7 +64,7 @@ def check_login(username, password):
 
 
 def get_all_department():
-    return Department.objects.all()
+    return Structure.objects.all()
 
 
 def get_all_type():

@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from .forms import loginForm
 from django.contrib.auth import authenticate, login
 from .api import check_cookie, DecimalEncoder, is_login
-from .models import UserType, Employee, Department, Notice, Leave, HolidayArrangements, Signingin, \
+from .models import UserType, Employee, Structure, Notice, Leave, HolidayArrangements, Signingin, \
     WorkTime, LeaveType, EveryDayArrangements
 # django自带加密解密库
 from django.views.decorators.csrf import csrf_exempt
@@ -189,10 +189,10 @@ def edit_emp_info(request):
         # 所有用户类型列表
         user_type_list = UserType.objects.all()
         # 所有的部门
-        dept_list = Department.objects.all()
+        dept_list = Structure.objects.all()
 
         if request.method == 'POST':
-            department = Department.objects.get(name=request.POST.get('department'))
+            department = Structure.objects.get(name=request.POST.get('department'))
             user_type = UserType.objects.get(caption=request.POST.get('user_type'))
             full_name = request.POST.get('full_name')
             gender = request.POST.get('gender')
@@ -418,7 +418,7 @@ def total(request):
 #     print('departmentManage:flag', flag)
 #     if flag:
 #         if rank.user_type.caption == 'admin':
-#             class_list = Department.objects.all()
+#             class_list = Structure.objects.all()
 #
 #             return render(request, 'department_manage.html', {'class_list': class_list})
 #         else:
@@ -437,14 +437,14 @@ def total(request):
 #             if request.method == 'POST':
 #                 pre_edit_id = request.POST.get('edit_id')
 #                 class_name = request.POST.get('edit_department_name')
-#                 temp_flag = Department.objects.filter(name=class_name)
+#                 temp_flag = Structure.objects.filter(name=class_name)
 #                 print('pre_edit_id1', pre_edit_id)
-#                 pre_obj = Department.objects.get(id=pre_edit_id)
+#                 pre_obj = Structure.objects.get(id=pre_edit_id)
 #                 if not temp_flag and class_name:
 #                     pre_obj.name = class_name
 #                     pre_obj.save()
 #                 return HttpResponse('部门修改成功')
-#             class_list = Department.objects.all()
+#             class_list = Structure.objects.all()
 #             return render(request, 'departmentManage.html', {'class_list': class_list})
 #             # return HttpResponse('编辑部门')
 #         else:
@@ -460,13 +460,13 @@ def total(request):
 #     if request.method == 'POST':
 #         # print('这是post')
 #         add_department_name = request.POST.get('add_department_name')
-#         flag = Department.objects.filter(name=add_department_name)
+#         flag = Structure.objects.filter(name=add_department_name)
 #         if flag:
 #             pass
 #             # print('已有数据，不处理')
 #         else:
 #             if add_department_name:
-#                 Department.objects.create(name=add_department_name).save()
+#                 Structure.objects.create(name=add_department_name).save()
 #
 #         return HttpResponse('添加部门成功')
 #
@@ -477,9 +477,9 @@ def total(request):
 #     print('flag', flag)
 #     if flag:
 #         if rank.user_type.caption == 'admin':
-#             # class_list=Department.objects.all()
+#             # class_list=Structure.objects.all()
 #             delete_id = request.GET.get('delete_id')
-#             Department.objects.filter(id=delete_id).delete()
+#             Structure.objects.filter(id=delete_id).delete()
 #             return redirect('/departmentManage/')
 #         else:
 #             return render(request, 'department_manage_denied.html')
@@ -533,7 +533,7 @@ def total(request):
 #                     age = 0
 #
 #                 gender = int(request.POST.get('gender'))
-#                 cls = Department.objects.get(name=request.POST.get('cls'))
+#                 cls = Structure.objects.get(name=request.POST.get('cls'))
 #                 nickname = request.POST.get('nickname')
 #                 usertype = UserType.objects.get(caption=request.POST.get('user_type'))
 #                 phone = request.POST.get('phone')
@@ -552,7 +552,7 @@ def total(request):
 #                 # 所有用户类型列表
 #                 emp_type_list = UserType.objects.all()
 #                 # 所有的部门
-#                 cls_list = Department.objects.all()
+#                 cls_list = Structure.objects.all()
 #                 # 所有的专业
 #                 major_list = MajorInfo.objects.all()
 #                 # 当前编辑的用户对象

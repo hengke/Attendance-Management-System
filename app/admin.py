@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
-from .models import UserType, Employee, Department, Leave, Notice, Signingin
+from .models import UserType, Employee, Structure, Leave, Notice, Signingin
 from .models import WorkTime, HolidayName, HolidayArrangements, LeaveType
 
 
@@ -34,23 +34,22 @@ class UserTypeAdmin(admin.ModelAdmin):
 
 
 # class EmployeeAdmin(admin.ModelAdmin):
-#     # list_display = ['employee'.id, 'employee'.username, 'employee'.password, 'emp_num', 'department']
-#     list_display = ['user', 'user_type', 'emp_num', 'department']
+#     # list_display = ['employee'.id, 'employee'.username, 'employee'.password, 'emp_num', 'Structure']
+#     list_display = ['user', 'user_type', 'emp_num', 'Structure']
 
 
 class EmployeeInline(admin.TabularInline):
     model = Employee
-    fields = ['user_type', 'emp_num', 'department']
+    fields = ['user_type', 'emp_num', 'department', 'superior']
     can_delete = False
-    verbose_name_plural = '员工信息'
 
 
 class UserAdmin(UserAdmin):
     inlines = (EmployeeInline,)
 
 
-class DepartmentAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'parent_dept_id']
+class StructureAdmin(admin.ModelAdmin):
+    fields = ['id', 'type_choices', 'title', 'type', 'parent']
 
 
 class LeaveAdmin(admin.ModelAdmin):
@@ -91,7 +90,7 @@ admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 # admin.site.register(Employee, EmployeeAdmin)
 
-admin.site.register(Department, DepartmentAdmin)
+admin.site.register(Structure, StructureAdmin)
 admin.site.register(Leave, LeaveAdmin)
 # admin.site.register(Signingin, SigninginAdmin)
 admin.site.register(Notice, NoticeAdmin)

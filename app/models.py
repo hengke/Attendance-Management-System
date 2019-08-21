@@ -13,6 +13,10 @@ class WorkTime(models.Model):
     end_time = models.TimeField(null=False, blank=True, verbose_name='结束时间')
     remarks = models.TextField(default='', blank=True, max_length=100, verbose_name='备注')
 
+    class Meta:
+        verbose_name = "工作时间制度"
+        verbose_name_plural = verbose_name
+
     def __str__(self):
         return self.name
 
@@ -23,29 +27,35 @@ class WorkTime(models.Model):
             return False
 
 
-# 节日名称
+# 节假日名称
 class HolidayName(models.Model):
-    name = models.TextField(max_length=20, verbose_name='假期名称')
+    name = models.TextField(max_length=20, verbose_name='节假日名称')
     remarks = models.TextField(default='', blank=True, max_length=100, verbose_name='备注')
+
+    class Meta:
+        verbose_name = "节假日名称"
+        verbose_name_plural = verbose_name
 
     def __str__(self):
         return self.name
 
 
-# 节日假期及调休表
+# 节假日及调休表
 class HolidayArrangements(models.Model):
     date = models.DateField(null=False, verbose_name='日期')
     name = models.ForeignKey(to='HolidayName', on_delete=models.CASCADE, verbose_name='假期名称')
     is_legal_holiday = models.BooleanField(default=False, verbose_name='是否法定节假日')
+
+    class Meta:
+        verbose_name = "节假日及调休表"
+        verbose_name_plural = verbose_name
+        ordering = ['date']
 
     def __str__(self):
         str1 = self.name.name + ':' + self.date.strftime('%Y-%m-%d')
         if self.is_legal_holiday:
             str1 = str1 + ':法定节假日'
         return str1
-
-    class Meta:
-        ordering = ['date']
 
 
 class EveryDayArrangements(models.Model):
@@ -57,11 +67,19 @@ class EveryDayArrangements(models.Model):
     holiday_name = models.TextField(default='', blank=True, max_length=100, verbose_name='节假日名称')
     remarks = models.TextField(default='', blank=True, max_length=100, verbose_name='备注')
 
+    # class Meta:
+    #     verbose_name = "员工信息"
+    #     verbose_name_plural = verbose_name
+
 
 # 休假类别
 class LeaveType(models.Model):
     name = models.TextField(max_length=20, verbose_name='假别')
     remarks = models.TextField(default='', blank=True, max_length=100, verbose_name='假期名称')
+
+    class Meta:
+        verbose_name = "休假类别"
+        verbose_name_plural = verbose_name
 
     def __str__(self):
         return self.name
@@ -70,6 +88,10 @@ class LeaveType(models.Model):
 class UserType(models.Model):
     # 用户类型表  字段：用户类型
     caption = models.CharField(max_length=10, verbose_name='用户类型')
+
+    class Meta:
+        verbose_name = "用户类型"
+        verbose_name_plural = verbose_name
 
     def __str__(self):
         return self.caption
@@ -81,17 +103,28 @@ class Employee(models.Model):
         ('男', '男'),
         ('女', '女'),
         )
-    # 创建用户模型，员工编号,密码，部门，姓名,昵称，专业,用户类型,电话，姓名,座右铭,邮件
+    # 创建用户模型，员工编号,密码，部门，姓名,昵称，专业,用户类型,电话，姓名,邮件
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     user_type = models.ForeignKey(to='UserType', on_delete=models.CASCADE, verbose_name='用户类型')
+
     emp_num = models.CharField(max_length=15, primary_key=True, verbose_name='员工编号')
-    department = models.ForeignKey('Department', null=True, on_delete=models.CASCADE, verbose_name='部门')
+    department = models.ForeignKey('Structure', null=True, blank=True, on_delete=models.CASCADE, verbose_name='部门')
+    post = models.CharField(max_length=50, null=True, blank=True, verbose_name="职位")
+    superior = models.ForeignKey("self", null=True, blank=True, on_delete=models.CASCADE, verbose_name="上级主管")
+    # roles = models.ManyToManyField("rbac.Role", verbose_name="角色", blank=True)
+    joined_date = models.DateField(null=True, blank=True, verbose_name="入职日期")
 
     full_name = models.CharField(max_length=30, null=True, verbose_name='姓名')
     gender = models.CharField(max_length=30, choices=GENDER_CHOICES, verbose_name='性别')
     birth_date = models.DateField(null=True, verbose_name='出生日期')
     cell_phone = models.CharField(max_length=11, verbose_name='手机号码')
     work_phone = models.CharField(max_length=20, verbose_name='办公电话')
+    image = models.ImageField(upload_to="image/%Y/%m", default="image/default.jpg", max_length=100, null=True,
+                              blank=True)
+
+    class Meta:
+        verbose_name = "员工信息"
+        verbose_name_plural = verbose_name
 
     def __str__(self):
         # return self.username
@@ -101,13 +134,21 @@ class Employee(models.Model):
         return User.objects.get(username)
 
 
-# 部门信息表
-class Department(models.Model):
-    name = models.CharField(max_length=20, verbose_name='部门名称')
-    parent_dept_id = models.CharField(max_length=64, verbose_name='上级部门编号')
+class Structure(models.Model):
+    """
+    组织架构
+    """
+    type_choices = (("firm", "公司"), ("department", "部门"))
+    title = models.CharField(max_length=60, verbose_name="名称")
+    type = models.CharField(max_length=20, choices=type_choices, default="department", verbose_name="类型")
+    parent = models.ForeignKey("self", null=True, blank=True, on_delete=models.CASCADE, verbose_name="父类架构")
+
+    class Meta:
+        verbose_name = "组织架构"
+        verbose_name_plural = verbose_name
 
     def __str__(self):
-        return self.name
+        return self.title
 
 
 # 请假表
@@ -126,6 +167,11 @@ class Leave(models.Model):
     leave_id = models.TextField(max_length=255, verbose_name='假单编号')
     approval_id = models.TextField(max_length=255, verbose_name='审批单编号')
 
+    class Meta:
+        verbose_name = "请假记录"
+        verbose_name_plural = verbose_name
+        ordering = ['ask_time']
+
     def __str__(self):
         return self.leave_id
 
@@ -134,9 +180,6 @@ class Leave(models.Model):
             return '%d' % ((self.report_back_time - self.start_time).days + 1)
 
         return '%d' % ((self.end_time - self.start_time).days + 1)
-
-    class Meta:
-        ordering = ['ask_time']
 
     leave_days = property(_get_leave_days)
 
@@ -159,6 +202,10 @@ class Attendance(models.Model):
     remarks = models.TextField(default='', verbose_name='备注')
     # 补签，补签同意
 
+    class Meta:
+        verbose_name = "考勤记录"
+        verbose_name_plural = verbose_name
+
     def __str__(self):
         return self.employee.user.username
 
@@ -178,6 +225,10 @@ class Signingin(models.Model):
     reason = models.TextField(default='', max_length=500, verbose_name='原因')
     remarks = models.TextField(default='', verbose_name='备注')
 
+    class Meta:
+        verbose_name = "签到表"
+        verbose_name_plural = verbose_name
+
     def __str__(self):
         return self.employee.user.username
 
@@ -191,13 +242,21 @@ class Notice(models.Model):
     content = models.TextField(max_length=500)
     level = models.IntegerField(default=0)
 
+    class Meta:
+        verbose_name = "公告表"
+        verbose_name_plural = verbose_name
 
-# # 考核内容
-# # 考核内容表：标题，名称，批阅状态
+
+# 考核内容
+# 考核内容表：标题，名称，批阅状态
 # class ExamContent(models.Model):
 #     title = models.TextField(max_length=200)
 #     date = models.DateField(auto_now=True)
 #     state = models.BooleanField(default=False)
+#
+#     class Meta:
+#         verbose_name = "考核内容"
+#         verbose_name_plural = verbose_name
 #
 #     def __str__(self):
 #         return self.title
@@ -210,3 +269,8 @@ class Notice(models.Model):
 #     content = models.ForeignKey(to='ExamContent', on_delete=models.CASCADE)
 #     point = models.DecimalField(max_digits=3, decimal_places=0, default=0)
 #     detail = models.TextField(max_length=200, default="无")
+#
+#     class Meta:
+#         verbose_name = "考核成绩"
+#         verbose_name_plural = verbose_name
+

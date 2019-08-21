@@ -132,11 +132,16 @@ USE_TZ = False
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, "static"),
-)
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+if DEBUG:
+    STATICFILES_DIRS = (
+        os.path.join(BASE_DIR, 'static'),
+    )
+# 非部署时，debug为True，使用以下代替STATIC_ROOT才能加载上传的图片
+else:
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # 文件存储配置
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # 默认根目录
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # 默认根目录
+
+

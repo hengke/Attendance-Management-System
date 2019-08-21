@@ -15,12 +15,14 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.views.static import serve
 from app import views
-
+from mysite.settings import MEDIA_ROOT, STATIC_ROOT
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    # url(r'^static/(?P<path>.*)$', {'document_root': STATIC_ROOT}),
+    url(r'^media/(?P<path>.*)$', serve, {"document_root": MEDIA_ROOT}),
+    url(r'^static/(?P<path>.*)$', serve, {'document_root': STATIC_ROOT}),
     url(r'^$', views.index),
     url(r'^login/', views.login, name='login'),
     url(r'^register/', views.register, name='register'),

@@ -1,0 +1,24 @@
+1、安装PostgreSQL，初始化数据库，创建用户及数据库
+sudo pacman -Sy postgresql
+sudo su - postgres
+initdb --locale en_US.UTF-8 -E UTF8 -D '/var/lib/postgres/data'
+systemctl start postgresql.service
+createuser --interactive -P
+
+username: ams_django
+password: ams_django
+
+createdb --owner ams_django ams_django_db
+
+2、安装Python组件
+pip install gunicorn
+pip install psycopg2
+pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ Pillow
+
+3、导入配套数据
+python app/loaddata.py
+
+4、创建超级用户
+python manage.py createsuperuser
+username: ams_django
+password:

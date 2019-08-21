@@ -1,18 +1,75 @@
 import os
+from datetime import datetime, timedelta
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
-
 
 import django
 if django.VERSION >= (1, 7):#自动判断版本
     django.setup()
 
+from app.models import HolidayName, HolidayArrangements, EveryDayArrangements, LeaveType, UserType
+from app.models import WorkTime
 
-def HolidayArrangements():
-    from app.models import HolidayName
-    from app.models import HolidayArrangements
 
-    print('Django %s' % django.get_version())
+def LoadWorkTime():
+    print('Start load UserType data into database from ../sampledata/WorkTime.txt')
+    f = open('../sampledata/WorkTime.txt')
+    all_lines = f.readlines()
+    f.close()
+    for i in range(1, len(all_lines)):
+        strs = all_lines[i].rstrip('\n').split(',')
+        h = WorkTime()
+        h.name = strs[0]
+        h.shift = strs[1]
+        h.start_time = strs[2]
+        h.end_time = strs[3]
+        h.remarks = strs[4]
+        h.save()
+    print(WorkTime.objects.all())
 
+
+def LoadUserType():
+    print('Start load UserType data into database from ../sampledata/UserType.txt')
+    f = open('../sampledata/UserType.txt')
+    all_lines = f.readlines()
+    f.close()
+    for i in range(1, len(all_lines)):
+        str = all_lines[i].rstrip('\n')
+        h = UserType()
+        h.caption = str
+        h.save()
+    print(UserType.objects.all())
+
+
+def LoadLeaveType():
+    print('Start load LeaveType data into database from ../sampledata/LeaveType.txt')
+    f = open('../sampledata/LeaveType.txt')
+    all_lines = f.readlines()
+    f.close()
+    for i in range(1, len(all_lines)):
+        str = all_lines[i].rstrip('\n')
+        h = LeaveType()
+        h.name = str
+        h.save()
+    print(LeaveType.objects.all())
+
+
+def LoadHolidayName():
+    print('Start load HolidayName data into database from ../sampledata/HolidayName.txt')
+    f = open('../sampledata/HolidayName.txt')
+    all_lines = f.readlines()
+    f.close()
+    for i in range(1, len(all_lines)):
+        strs = all_lines[i].rstrip('\n').split(',')
+        h = HolidayName()
+        h.name = strs[0]
+        if len(strs) > 1:
+            h.remarks = strs[1]
+        h.save()
+    print(HolidayName.objects.all())
+
+
+def LoadHolidayArrangements():
+    print('Start load HolidayArrangements data into database from ../sampledata/HolidayArrangements.txt')
     all_HolidayName = HolidayName.objects.all()
     print(all_HolidayName)
     f = open('../sampledata/HolidayArrangements.txt')
@@ -34,10 +91,7 @@ def HolidayArrangements():
 
 
 def MakeEveryDayArrangements(year):
-    from app.models import HolidayArrangements
-    from datetime import datetime, timedelta
-
-    from app.models import EveryDayArrangements
+    print('Start make EveryDayArrangements data')
     all_HolidayArrangements = HolidayArrangements.objects.all()
     myday = datetime(year - 1, 12, 28)
     for i in range(1, 369):
@@ -71,6 +125,10 @@ def MakeEveryDayArrangements(year):
 
 
 if __name__ == "__main__":
-    # HolidayArrangements()
-    MakeEveryDayArrangements(2019)
+    LoadWorkTime()
+    # LoadUserType()
+    # LoadLeaveType()
+    # LoadHolidayName()
+    # LoadHolidayArrangements()
+    # MakeEveryDayArrangements(2019)
     print('Done!')
