@@ -20,6 +20,7 @@ from app import views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    # url(r'^static/(?P<path>.*)$', {'document_root': STATIC_ROOT}),
     url(r'^$', views.index),
     url(r'^login/', views.login, name='login'),
     url(r'^register/', views.register, name='register'),

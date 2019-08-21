@@ -10,22 +10,27 @@ from .models import WorkTime, HolidayName, HolidayArrangements, LeaveType
 
 class WorkTimeAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'shift', 'start_time', 'end_time', 'remarks']
+    verbose_name_plural = '工作时间'
 
 
 class HolidayNameAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'remarks']
+    verbose_name_plural = '节假日名称'
 
 
 class HolidayArrangementsAdmin(admin.ModelAdmin):
     list_display = ['id', 'date', 'name', 'is_legal_holiday']
+    verbose_name_plural = '节假日及调休表'
 
 
 class LeaveTypeAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'remarks']
+    verbose_name_plural = '休假类别'
 
 
 class UserTypeAdmin(admin.ModelAdmin):
     list_display = ['id', 'caption']
+    verbose_name_plural = '用户类别'
 
 
 # class EmployeeAdmin(admin.ModelAdmin):
@@ -35,8 +40,9 @@ class UserTypeAdmin(admin.ModelAdmin):
 
 class EmployeeInline(admin.TabularInline):
     model = Employee
+    fields = ['user_type', 'emp_num', 'department']
     can_delete = False
-    verbose_name_plural = 'employee'
+    verbose_name_plural = '员工信息'
 
 
 class UserAdmin(UserAdmin):
@@ -51,6 +57,7 @@ class LeaveAdmin(admin.ModelAdmin):
     list_display = ['id', 'employee', 'leave_id', 'leave_type', 'ask_time',
                     'report_back_time', 'start_time', 'end_time', 'reason',
                     'destination', 'approval_id']
+    verbose_name_plural = '休假管理'
 
 
 # class SigninginAdmin(admin.ModelAdmin):
@@ -59,10 +66,12 @@ class LeaveAdmin(admin.ModelAdmin):
 
 class NoticeAdmin(admin.ModelAdmin):
     list_display = ['id', 'author', 'head', 'content', 'level']
+    verbose_name_plural = '通告管理'
 
 
 class WorkOvertimeAdmin(admin.ModelAdmin):
     list_display = ['employee', 'start_time', 'end_time', 'duration']
+    verbose_name_plural = '加班管理'
  
 
 # class ExamAdmin(admin.ModelAdmin):
