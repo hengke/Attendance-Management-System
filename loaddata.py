@@ -12,7 +12,61 @@ if 'setup' in dir(django):
     django.setup()
 
 from app.models import HolidayName, HolidayArrangements, EveryDayArrangements, LeaveType, UserType
-from app.models import WorkTime
+from app.models import WorkTime, Structure, Employee
+
+
+def LoadStructure():
+    print('Start load Structure data into database from ./sampledata/Structure.txt')
+    f = open('./sampledata/Structure.txt')
+    all_lines = f.readlines()
+    f.close()
+    for i in range(1, len(all_lines)):
+        strs = all_lines[i].rstrip('\n').split(',')
+        h = Structure()
+        if strs[0] == '公司' or strs[0] == 'firm':
+            h.type = 'firm'
+        else:
+            h.type = 'department'
+
+        h.title = strs[1]
+        try:
+            parent = Structure.objects.get(title=strs[2])
+        except Structure.DoesNotExist:
+            pass
+        else:
+            h.parent = parent
+
+        h.save()
+    print(Structure.objects.all())
+    print('Done!\n')
+
+
+def LoadEmployee():
+    print('Start load Employee data into database from ./sampledata/Employee.csv')
+    f = open('./sampledata/Employee.csv')
+    all_lines = f.readlines()
+    f.close()
+    for i in range(1, len(all_lines)):
+        strs = all_lines[i].rstrip('\n').split(',')
+        h = Employee()
+        h.full_name = strs[0]
+        h.department = strs[0]
+        h.user = strs[0]
+        h.user_type = strs[0]
+        h.post = strs[0]
+        h.superior = strs[0]  # 上级主管
+
+        h.title = strs[1]
+        try:
+            parent = Employee.objects.get(title=strs[2])
+        except Employee.DoesNotExist:
+            pass
+        else:
+            h.parent = parent
+
+        h.save()
+    print(Employee.objects.all())
+    print('Done!\n')
 
 
 def LoadWorkTime():
@@ -136,9 +190,10 @@ def MakeEveryDayArrangements(year):
 
 
 if __name__ == "__main__":
-    LoadWorkTime()
-    LoadUserType()
-    LoadLeaveType()
-    LoadHolidayName()
-    LoadHolidayArrangements()
-    MakeEveryDayArrangements(2019)
+    LoadStructure()
+    # LoadWorkTime()
+    # LoadUserType()
+    # LoadLeaveType()
+    # LoadHolidayName()
+    # LoadHolidayArrangements()
+    # MakeEveryDayArrangements(2019)
