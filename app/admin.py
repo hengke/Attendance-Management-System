@@ -49,7 +49,8 @@ class UserAdmin(UserAdmin):
 
 
 class StructureAdmin(admin.ModelAdmin):
-    fields = ['id', 'type_choices', 'title', 'type', 'parent']
+    list_display = ['id', 'type', 'title', 'parent']
+    fields = ['id', 'type', 'title', 'parent']
 
 
 class LeaveAdmin(admin.ModelAdmin):

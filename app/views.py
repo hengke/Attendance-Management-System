@@ -186,14 +186,15 @@ def edit_emp_info(request):
     user = rank
     if flag:
         emp = Employee.objects.get(user=user)
+        print(emp.birth_date)
         # 所有用户类型列表
         user_type_list = UserType.objects.all()
         # 所有的部门
         dept_list = Structure.objects.all()
 
         if request.method == 'POST':
-            department = Structure.objects.get(name=request.POST.get('department'))
-            user_type = UserType.objects.get(caption=request.POST.get('user_type'))
+            # department = Structure.objects.get(title=request.POST.get('department'))
+            # user_type = UserType.objects.get(caption=request.POST.get('user_type'))
             full_name = request.POST.get('full_name')
             gender = request.POST.get('gender')
             birth_date = request.POST.get('birth_date')
@@ -203,8 +204,8 @@ def edit_emp_info(request):
 
             user.email = email
             emp.full_name = full_name
-            emp.department = department
-            emp.user_type = user_type
+            # emp.department = department
+            # emp.user_type = user_type
             emp.gender = gender
             emp.birth_date = birth_date
             emp.work_phone = work_phone

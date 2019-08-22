@@ -16,6 +16,7 @@ class WorkTime(models.Model):
     class Meta:
         verbose_name = "工作时间制度"
         verbose_name_plural = verbose_name
+        ordering = ['id']
 
     def __str__(self):
         return self.name
@@ -35,6 +36,7 @@ class HolidayName(models.Model):
     class Meta:
         verbose_name = "节假日名称"
         verbose_name_plural = verbose_name
+        ordering = ['id']
 
     def __str__(self):
         return self.name
@@ -67,7 +69,8 @@ class EveryDayArrangements(models.Model):
     holiday_name = models.TextField(default='', blank=True, max_length=100, verbose_name='节假日名称')
     remarks = models.TextField(default='', blank=True, max_length=100, verbose_name='备注')
 
-    # class Meta:
+    class Meta:
+        ordering = ['date']
     #     verbose_name = "员工信息"
     #     verbose_name_plural = verbose_name
 
@@ -80,6 +83,7 @@ class LeaveType(models.Model):
     class Meta:
         verbose_name = "休假类别"
         verbose_name_plural = verbose_name
+        ordering = ['id']
 
     def __str__(self):
         return self.name
@@ -92,6 +96,7 @@ class UserType(models.Model):
     class Meta:
         verbose_name = "用户类型"
         verbose_name_plural = verbose_name
+        ordering = ['id']
 
     def __str__(self):
         return self.caption
@@ -146,6 +151,7 @@ class Structure(models.Model):
     class Meta:
         verbose_name = "组织架构"
         verbose_name_plural = verbose_name
+        ordering = ['id']
 
     def __str__(self):
         return self.title
@@ -205,6 +211,7 @@ class Attendance(models.Model):
     class Meta:
         verbose_name = "考勤记录"
         verbose_name_plural = verbose_name
+        ordering = ['date']
 
     def __str__(self):
         return self.employee.user.username
@@ -228,6 +235,7 @@ class Signingin(models.Model):
     class Meta:
         verbose_name = "签到表"
         verbose_name_plural = verbose_name
+        # ordering = ['date']
 
     def __str__(self):
         return self.employee.user.username
