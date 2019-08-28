@@ -25,6 +25,6 @@ password:
 4、导入配套数据
 TRUNCATE TABLE app_attendance, app_department, app_employee, app_everydayarrangements, app_holidayarrangements, app_holidayname, app_leave, app_leavetype, app_notice, app_signingin, app_usertype, app_worktime RESTART IDENTITY CASCADE;
 TRUNCATE TABLE app_attendance, app_structure, app_employee, app_everydayarrangements, app_holidayarrangements, app_holidayname, app_leave, app_leavetype, app_notice, app_signingin, app_usertype, app_worktime RESTART IDENTITY CASCADE;
-
+TRUNCATE TABLE app_employee RESTART IDENTITY CASCADE;
 python loaddata.py
 

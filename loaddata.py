@@ -11,8 +11,9 @@ print('Django %s' % django.get_version())
 if 'setup' in dir(django):
     django.setup()
 
+from django.contrib.auth.models import User
 from app.models import HolidayName, HolidayArrangements, EveryDayArrangements, LeaveType, UserType
-from app.models import WorkTime, Structure, Employee
+from app.models import WorkTime, Structure, Employee, UserType
 
 
 def LoadStructure():
@@ -43,28 +44,48 @@ def LoadStructure():
 
 def LoadEmployee():
     print('Start load Employee data into database from ./sampledata/Employee.csv')
+    # print(os.path.abspath('.'))
     f = open('./sampledata/Employee.csv')
     all_lines = f.readlines()
     f.close()
+
     for i in range(1, len(all_lines)):
         strs = all_lines[i].rstrip('\n').split(',')
-        h = Employee()
-        h.full_name = strs[0]
-        h.department = strs[0]
-        h.user = strs[0]
-        h.user_type = strs[0]
-        h.post = strs[0]
-        h.superior = strs[0]  # 上级主管
 
-        h.title = strs[1]
         try:
-            parent = Employee.objects.get(title=strs[2])
+            user = User.objects.get(username=strs[5])
+        except User.DoesNotExist:
+            user = User.objects.create_user(strs[5], '', 'ktkfyjy')
+            user.save()
+
+        user_type = UserType.objects.get(caption=strs[6])
+
+        try:
+            employee = Employee.objects.get(user=user)
         except Employee.DoesNotExist:
+            employee = Employee.objects.create(user=user, user_type=user_type)
+
+        employee.full_name = strs[0]
+        try:
+            depts2 = Structure.objects.filter(title=strs[2])
+        except Structure.DoesNotExist:
             pass
         else:
-            h.parent = parent
+            if strs[3] == "":
+                if len(depts2) == 1:
+                    employee.department = depts2[0]
+            else:
+                try:
+                    depts3 = Structure.objects.filter(parent=depts2[0]).filter(title=strs[3])
+                except Structure.DoesNotExist:
+                    pass
+                else:
+                    if len(depts3) == 1:
+                        employee.department = depts3[0]
+        # employee.superior = strs[0]  # 上级主管
+        # employee.save()
+        print(employee.full_name, employee.department.parent, employee.department)
 
-        h.save()
     print(Employee.objects.all())
     print('Done!\n')
 
@@ -190,10 +211,11 @@ def MakeEveryDayArrangements(year):
 
 
 if __name__ == "__main__":
-    LoadStructure()
+    # LoadStructure()
     # LoadWorkTime()
     # LoadUserType()
     # LoadLeaveType()
     # LoadHolidayName()
     # LoadHolidayArrangements()
     # MakeEveryDayArrangements(2019)
+    LoadEmployee()
