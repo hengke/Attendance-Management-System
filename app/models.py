@@ -112,7 +112,8 @@ class Employee(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     user_type = models.ForeignKey(to='UserType', on_delete=models.CASCADE, verbose_name='用户类型')
 
-    emp_num = models.CharField(max_length=15, primary_key=True, verbose_name='员工编号')
+    emp_num = models.CharField(max_length=15, verbose_name='员工编号')
+    # emp_num = models.CharField(max_length=15, primary_key=True, verbose_name='员工编号')
     department = models.ForeignKey('Structure', null=True, blank=True, on_delete=models.CASCADE, verbose_name='部门')
     post = models.CharField(max_length=50, null=True, blank=True, verbose_name="职位")
     superior = models.ForeignKey("self", null=True, blank=True, on_delete=models.CASCADE, verbose_name="上级主管")
